@@ -19,6 +19,7 @@ class Render:
         self.ground_images = []
         self.tree_images = []
         self.combined_images = []
+        self.random_tree_positions = {}
 
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
@@ -46,7 +47,9 @@ class Render:
 
         for row_idx, row in enumerate(self.map.data):
             for col_idx, terrain_value in enumerate(row):
+                position_by_grid = (row_idx, col_idx)
                 position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+                
                 # water
                 if terrain_value == 0:
                     pass
@@ -57,6 +60,15 @@ class Render:
                 
                 # tree
                 elif terrain_value == 10:
+                    if position_by_grid in self.random_tree_positions:
+                        position = self.random_tree_positions[position_by_grid]
+                    
+                    else:
+                        if random.random() > 0.4:  position = (position[0] + random.randint(1, 10),  position[1] + random.randint(1, 10))
+                        if random.random() > 0.8:  position = (position[0] - random.randint(1, 10),  position[1] + random.randint(1, 10))
+
+                        self.random_tree_positions[position_by_grid] = position
+
                     self.tree_images.append((self.tree.image, position))
                 
         self.combined_images = self.ground_images + self.tree_images

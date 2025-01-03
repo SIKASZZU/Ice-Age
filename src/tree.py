@@ -1,26 +1,28 @@
-import random
+import pygame
 
 class Tree:
-    def __init__(self, map):
+    def __init__(self, images, map):
+        self.images = images
         self.map = map
-        self.sprite = 0
-        self.width = 100
-        self.heigth = 100
-        self.spots = self.get_potential_spots()
 
-    def get_potential_spots(self):
-        spots = set()
-        for row_idx, row in enumerate(self.map.data):
-            for col_idx, value in enumerate(row):
-                if value == 1:
-                    if random.random() < 0.4:
-                        spots.add((row_idx, col_idx))
-        return spots
+        self.width = self.map.tile_size * 1
+        self.height = self.map.tile_size * 1.5
+        
+        self.resource_value = (50, 120)
+
+        path = 'res/images/tree.png'
+        self.img = self.images.preloading('tree', path)
+        self.image = pygame.transform.scale(self.img, (self.width, self.height))
+        
+
+
+    def gather(self):
+        pass
 
 
     def spawn(self):
-        for index in self.spots: 
-            self.map.data[index[0]][index[1]] = 10
+        pass
+
 
     def update(self):
         pass

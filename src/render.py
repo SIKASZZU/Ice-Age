@@ -1,13 +1,25 @@
 import pygame
+import random
 
 
 class Render:
-    def __init__(self, screen, camera, map, player, clock):
+    def __init__(self, screen, camera, map, player, clock, tree, images):
         self.screen = screen
         self.camera = camera
         self.map = map
         self.player = player
         self.clock = clock
+        self.tree = tree
+        self.images = images
+
+        path = 'res/images/snow_ground.png'
+        self.ground_image = self.images.preloading('ground', path)
+
+        # listid
+        self.ground_images = []
+        self.tree_images = []
+        self.combined_images = []
+
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = {}
@@ -30,21 +42,31 @@ class Render:
         return terrain_in_view
 
     def render_terrain_in_view(self):
+        self.reset_image_lists()
+
         for row_idx, row in enumerate(self.map.data):
             for col_idx, terrain_value in enumerate(row):
-                rect = pygame.Rect(row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size -  self.camera.offset.y, self.map.tile_size, self.map.tile_size)
-
+                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
                 # water
                 if terrain_value == 0:
-                    pygame.draw.rect(self.screen, 'blue', rect)
-                
+                    pass
+
                 # terrain
                 elif terrain_value == 1:
-                    pygame.draw.rect(self.screen, 'green', rect)
+                    self.ground_images.append((self.ground_image, position))
                 
                 # tree
                 elif terrain_value == 10:
-                    pygame.draw.rect(self.screen, 'yellow', rect)
+                    self.tree_images.append((self.tree.image, position))
+                
+        self.combined_images = self.ground_images + self.tree_images
+        self.screen.blits(self.combined_images, doreturn=False)
+
+
+    def reset_image_lists(self):
+        self.ground_images = []
+        self.tree_images = []
+        self.combined_images = []
 
 
     def render_player(self):
@@ -57,4 +79,4 @@ class Render:
         # self.render_terrain_in_view(self.get_terrain_in_view())
         self.render_terrain_in_view()
         self.render_player()
-        # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS
+        print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS

@@ -5,7 +5,7 @@ class Map:
     def __init__(self, screen, camera):
         self.width = 100  # Player saab korraga näha max 20 - (1920 / 100 = 19.2 -> 20)
         self.height = 100  # Player saab korraga näha max 11 - (1080 / 100 = 10.8 -> 11)
-        self.tile_size = 10
+        self.tile_size = 100
         self.screen = screen
         self.camera = camera
 

@@ -10,36 +10,30 @@ class Map:
         self.camera = camera
 
         # Initialize data with procedural noise
-        self.data = self.generate_data()
+        self.data = self.generate_data(width=self.width, height=self.height)
 
-    def generate_data(self):
-        scale = 50.0
-        octaves = 6
-        persistence = 0.5
-        lacunarity = 2.0
-
-        data = np.zeros((self.height, self.width), dtype=int)
-        for y in range(self.height):
-            for x in range(self.width):
+    @staticmethod
+    def generate_data(width, height, scale=50.0, octaves=6, persistence=0.5, lacunarity=2.0, seed=42):
+        data = np.zeros((height, width), dtype=int)
+        for y in range(height):
+            for x in range(width):
                 noise_value = pnoise2(
                     x / scale,
                     y / scale,
                     octaves=octaves,
                     persistence=persistence,
                     lacunarity=lacunarity,
-                    repeatx=self.width,
-                    repeaty=self.height,
-                    base=42,
+                    repeatx=width,
+                    repeaty=height,
+                    base=seed,
                 )
-                
-                if 0.07 < noise_value:
-                    data[y, x] = 10
 
-                elif 0.07 > noise_value > 0.05 or 0.01 > noise_value > -0.04 > noise_value:
-                    data[y, x] = 1
-
-                else:
-                    data[y, x] = 0
+                if noise_value > 0.07:
+                    data[y, x] = 10  # Trees
+                elif 0.04 < noise_value <= 0.07 or (0 > noise_value > -0.01):
+                    data[y, x] = 1  # Ground
+                elif -0.01 >= noise_value >= -0.03 or (0 < noise_value <= 0.04):
+                    data[y, x] = 0  # Ice Water
 
         return data
 

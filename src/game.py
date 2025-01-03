@@ -21,6 +21,7 @@ class Game:
         self.camera = Camera()
         self.player = Player(self.screen, self.camera)
         self.map = Map(self.screen, self.camera)
+        self.tree = Tree(self.map)
 
 
     def logic(self):
@@ -31,6 +32,7 @@ class Game:
         self.screen.fill((0, 0, 0))  # Clear the screen with a black color
         self.map.update()
         self.player.update()  # Update player and keep them at the center of the screen
+        self.tree.update()
         pygame.display.flip()  # Update the display
 
 

@@ -1,16 +1,15 @@
 import pygame
 
 class Player:
-    def __init__(self, screen):
+    def __init__(self, screen, camera):
         self.screen = screen
+        self.camera = camera
 
         self.x = 10
         self.y = 10
         self.height = 50
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.sprite = 0
-        self.health = 100  # freeze meter
         self.movement_speed = 5
 
     def movement(self):
@@ -24,11 +23,14 @@ class Player:
         if keys[pygame.K_s]:
             self.y += self.movement_speed
 
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.rect.x = self.x
+        self.rect.y = self.y
 
+    def render_player(self):
+        # Adjust player position relative to the camera's offset
+        player_position_adjusted = (self.rect.x - self.camera.offset.x, self.rect.y - self.camera.offset.y)
+        pygame.draw.rect(self.screen, color='red', rect=pygame.Rect(player_position_adjusted[0], player_position_adjusted[1], self.width, self.height))
 
     def update(self):
-
         self.movement()
-        pygame.draw.rect(self.screen, color='red', rect=self.rect)
-
+        self.render_player()

@@ -2,12 +2,11 @@ import pygame
 
 
 class Render:
-    def __init__(self, screen, camera, map, player, font, clock):
+    def __init__(self, screen, camera, map, player, clock):
         self.screen = screen
         self.camera = camera
         self.map = map
         self.player = player
-        self.font = font
         self.clock = clock
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
@@ -31,16 +30,31 @@ class Render:
         return terrain_in_view
 
     def render_terrain_in_view(self):
-        ...
+        for row_idx, row in enumerate(self.map.data):
+            for col_idx, terrain_value in enumerate(row):
+                rect = pygame.Rect(row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size -  self.camera.offset.y, self.map.tile_size, self.map.tile_size)
+
+                # water
+                if terrain_value == 0:
+                    pygame.draw.rect(self.screen, 'blue', rect)
+                
+                # terrain
+                elif terrain_value == 1:
+                    pygame.draw.rect(self.screen, 'green', rect)
+                
+                # tree
+                elif terrain_value == 10:
+                    pygame.draw.rect(self.screen, 'yellow', rect)
+
+
+    def render_player(self):
+        # Adjust player position relative to the camera's offset
+        player_position_adjusted = (self.player.rect.x - self.camera.offset.x, self.player.rect.y - self.camera.offset.y)
+        pygame.draw.rect(self.screen, color='red', rect=pygame.Rect(player_position_adjusted[0], player_position_adjusted[1], self.player.width, self.player.height))
 
 
     def update(self):
-        self.screen.fill((0, 0, 0))  # Clear the screen
         # self.render_terrain_in_view(self.get_terrain_in_view())
-        self.player.update()  # Update player position and render
-
-        # Display FPS
-        fps_text = self.font.render(f"FPS: {self.clock.get_fps():.2f}", True, (255, 255, 255))
-        self.screen.blit(fps_text, (10, 10))
-
-        pygame.display.flip()  # Update the screen with the new rendering
+        self.render_terrain_in_view()
+        self.render_player()
+        # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS

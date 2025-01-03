@@ -6,6 +6,7 @@ from map import Map
 from tree import Tree
 from camera import Camera
 from player import Player
+from render import Render
 
 jurigged.watch()
 
@@ -22,6 +23,7 @@ class Game:
         self.player = Player(self.screen, self.camera)
         self.map = Map(self.screen, self.camera)
         self.tree = Tree(self.map)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock)
 
 
     def logic(self):
@@ -29,11 +31,13 @@ class Game:
 
 
     def render(self):
-        self.screen.fill((0, 0, 0))  # Clear the screen with a black color
-        self.map.update()
+        self.screen.fill((0, 0, 0))  # FIRST // Clear the screen with a black color
+        
+        self.renderer.update()
         self.player.update()  # Update player and keep them at the center of the screen
         self.tree.update()
-        pygame.display.flip()  # Update the display
+        
+        pygame.display.flip()  # LAST // Update display
 
 
     def run(self):

@@ -86,10 +86,10 @@ class Render:
                         self.static_map_surface.blit(ground_image, position)
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
-        terrain_in_view = {}
+        terrain_in_view = []
         # Determine the player's position on the grid
-        player_grid_x = self.player.grid_x_center
-        player_grid_y = self.player.grid_y_center
+        player_grid_x = self.player.x  // self.map.tile_size
+        player_grid_y = self.player.y  // self.map.tile_size
 
         # Define the render range (10x10 visible tiles)
         row_range_0 = max(0, player_grid_y - 5)
@@ -100,49 +100,48 @@ class Render:
         # Collect terrain data within the render range
         for row in range(row_range_0, row_range_1):
             for col in range(col_range_0, col_range_1):
-                terrain_value = self.map.data[row][col]
-                terrain_in_view[(col, row)] = terrain_value  # Store terrain by grid coordinates
+                terrain_in_view.append((col, row))
 
         return terrain_in_view
 
-    def render_terrain_in_view(self):
+    def render_terrain_in_view(self, terrain_in_view):
         self.reset_image_lists()
 
-        for row_idx, row in enumerate(self.map.data):
-            for col_idx, terrain_value in enumerate(row):
-                position_by_grid = (row_idx, col_idx)
+        for position_by_grid in terrain_in_view:
+            row_idx, col_idx = position_by_grid
+            terrain_value = self.map.data[row_idx][col_idx]
 
-                # water
-                if terrain_value in [0]:
-                    position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
-                    self.water_images.append((self.water_image, position))
+            # water
+            if terrain_value in [0]:
+                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+                self.water_images.append((self.water_image, position))
 
-                # terrain
-                elif terrain_value in [1, 10, 100, 110, 20]:
-                    ground_image = None
-                    position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+            # terrain
+            elif terrain_value in [1, 10, 100, 110, 20]:
+                ground_image = None
+                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
-                    if terrain_value in [1, 10]:
-                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
-                        ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
-                        if not ground_image:
-                            ground_image = self.ground_image
+                if terrain_value in [1, 10]:
+                    surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
+                    ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
+                    if not ground_image:
+                        ground_image = self.ground_image
 
-                    # TODO: Ground + Melted + Water -> Tilesetti vaja
-                    if terrain_value in [100, 110, 20]:
-                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
-                        ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
-                        if not ground_image:
-                            surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.melted_water_values)
-                            ground_image = self.tile_set.determine_melted_water_image(surroundings)
+                # TODO: Ground + Melted + Water -> Tilesetti vaja
+                if terrain_value in [100, 110, 20]:
+                    surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
+                    ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
+                    if not ground_image:
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.melted_water_values)
+                        ground_image = self.tile_set.determine_melted_water_image(surroundings)
 
-                        if not ground_image:
-                            ground_image = self.snowy_heated_image
+                    if not ground_image:
+                        ground_image = self.snowy_heated_image
 
-                    self.render_after_ground(terrain_value, position_by_grid, row_idx, col_idx)
+                self.render_after_ground(terrain_value, position_by_grid, row_idx, col_idx)
 
-                    if ground_image:
-                        self.ground_images.append((ground_image, position))
+                if ground_image:
+                    self.ground_images.append((ground_image, position))
 
         self.combined_images = self.water_images + self.ground_images + self.heat_source_images + self.tree_images
         self.screen.blits(self.combined_images, doreturn=False)
@@ -205,8 +204,13 @@ class Render:
 
 
     def update(self):
-        # self.render_terrain_in_view(self.get_terrain_in_view())
-        self.render_terrain_in_view()
+        terrain_in_view = self.get_terrain_in_view()
+        self.render_terrain_in_view(terrain_in_view)
         self.render_player()
 
         # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS
+
+    # for tree around player in range of 2:
+    #     dont render in render_terrain_in_view
+
+

@@ -1,5 +1,6 @@
 import math
 
+
 class HeatZone:
     def __init__(self, screen, map, camera):
         self.map = map
@@ -29,7 +30,6 @@ class HeatZone:
         self.current_heat_source = current_heat_source
         self.radius = self.heat_zones_dict[self.current_heat_source]  # 2
 
-    import math
 
     def update_heat_zone(self):
         """Update the terrain values around the fire source."""

@@ -10,6 +10,7 @@ from render import Render
 from images import Images
 from tileset import TileSet
 from heat_zone import HeatZone
+from framerate import Framerate
 
 jurigged.watch()
 
@@ -31,6 +32,9 @@ class Game:
         self.heat_zone = HeatZone(self.screen, self.map, self.camera)
         self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
         self.weather = Weather(self.screen, self.player)
+        self.frame_rate = Framerate()
+
+
 
 
     def logic(self):
@@ -46,7 +50,6 @@ class Game:
         
         pygame.display.flip()  # LAST // Update display
 
-
     def run(self):
         """Main game loop."""
 
@@ -54,10 +57,20 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
             self.render()
             self.logic()
-            self.clock.tick(6000)  # Limit the game to 60 FPS
-            pygame.display.set_caption(f"Ice Age - {int(self.clock.get_fps())}")
+
+            # Update FPS list
+            current_fps = self.clock.get_fps()
+            self.frame_rate.update(current_fps)
+
+            # Display FPS statistics
+            fps_text = self.frame_rate.display_fps_statistics()
+            print(fps_text)
+            self.clock.tick(5000)  # Limit the game to 60 FPS
+            pygame.display.set_caption(f"Ice Age - {fps_text}")
+
         pygame.quit()
 
 

@@ -63,8 +63,6 @@ class Map:
     def get_terrain_value_at(self, x, y) -> int:
         if 0 <= x < self.width and 0 <= y < self.height:
 
-            print(self.data[y, x], y, x)
-            print(self.get_terrain_value_positions(20))
             return self.data[y, x]
         else:
             print(f'Out of bounds or smth - ({x};{y})')

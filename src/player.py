@@ -1,5 +1,6 @@
 import pygame
 
+
 class Player:
     def __init__(self, screen, camera, map):
         self.screen = screen
@@ -13,7 +14,7 @@ class Player:
         self.height = 50
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.movement_speed = 50
+        self.movement_speed = 5
 
 
     def movement(self):

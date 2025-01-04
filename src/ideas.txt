@@ -12,3 +12,5 @@ Kui piisavalt on puitu et teha kas campfire upgrade voi uus campfire ss tuleb mi
     # naiteks uue campfirei nupp on playeri kohal (campf tekib playeri alla)
     # naiteks campfire upgrade nupp on placed campfirei kohal
 
+Puidu amount on nagu skill > alguses saab vahem, siis hiljem hakkab saama rohkem.
+

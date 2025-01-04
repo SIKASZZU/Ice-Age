@@ -32,7 +32,7 @@ class Game:
         self.heat_zone = HeatZone(self.screen, self.map, self.camera)
         self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
         self.weather = Weather(self.screen, self.player)
-        self.frame_rate = Framerate()
+        self.framerate = Framerate()
 
 
 
@@ -63,10 +63,12 @@ class Game:
 
             # Update FPS list
             current_fps = self.clock.get_fps()
-            self.frame_rate.update(current_fps)
+            self.framerate.update(current_fps)
 
             # Display FPS statistics
-            fps_text = self.frame_rate.display_fps_statistics()
+
+            fps_text = self.framerate.display_fps_statistics()
+
             self.clock.tick(5000)  # Limit the game to 60 FPS
             pygame.display.set_caption(f"Ice Age - {fps_text}")
 

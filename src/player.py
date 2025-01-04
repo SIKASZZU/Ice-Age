@@ -2,10 +2,12 @@ import pygame
 
 
 class Player:
-    def __init__(self, screen, camera, map):
+    def __init__(self, screen, camera, map, font, images):
         self.screen = screen
         self.camera = camera
         self.map = map
+        self.font = font
+        self.images = images
 
         player_pos_grid = self.map.get_terrain_value_positions(20)  # 20 -> Torch ID
 
@@ -17,6 +19,9 @@ class Player:
         self.movement_speed = 5
         
         self.inv = {}
+        tree_logs_path = 'res/images/wood_icon.png'
+        tree_log_img = self.images.preloading('log', tree_logs_path)
+        self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height)) 
 
 
     def movement(self):
@@ -53,10 +58,28 @@ class Player:
         print(f'Removed {amount, item_name}. INV:{self.inv}')
 
 
-    def inventory(self):
-        pass
+    def inventory_display(self):
+        """ Above player """
             
+        # FIXME: autistic
+        item = 'Wood'
+
+        # for item in self.inv:
+        #     print(item)
+        if item not in self.inv:
+            return
+        
+        text_amount = str(self.inv[item])
+
+        text_surface = self.font.render(text_amount, True, 'gray')
+        text_rect = text_surface.get_rect(center=(self.screen.get_width() // 2 + 35, self.screen.get_height() // 2 - 70))
+        # log_rect  = text_surface.get_rect(center=(self.screen.get_width() // 2 - 35, self.screen.get_height() // 2 - 65))
+
+        self.screen.blit(self.tree_log_image, (self.screen.get_width() // 2 - 70, self.screen.get_height() // 2 - 100))
+        self.screen.blit(text_surface, text_rect)
+
+
 
     def update(self):
         self.movement()
-        self.inventory()
+        self.inventory_display()

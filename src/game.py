@@ -20,12 +20,14 @@ class Game:
         self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
+        self.font = pygame.font.Font(None, 50)
+        self.font.render
 
         # Initialize game components
         self.camera = Camera()
         self.map = Map(self.screen, self.camera)
-        self.player = Player(self.screen, self.camera, self.map)
         self.images = Images()
+        self.player = Player(self.screen, self.camera, self.map, self.font, self.images)
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player)
         self.tile_set = TileSet(self.images, self.map)
 
@@ -44,8 +46,8 @@ class Game:
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
         self.heat_zone.update_heat_zone()
         self.renderer.update()
-        self.player.update()  # Update player and keep them at the center of the screen
         self.tree.update()
+        self.player.update()  # Update player and keep them at the center of the screen
         self.weather.update()
         
         pygame.display.flip()  # LAST // Update display

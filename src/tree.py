@@ -11,10 +11,27 @@ class Tree:
 
         self.width = self.map.tile_size * 1
         self.height = self.map.tile_size * 1.5
-        
-        self.resource_value = (50, 120)
 
-        self.rect = pygame.Rect(0,0, self.width, self.height)
+        self.resource_stages = {
+            1: {'Wood': (1, 6)},
+
+            2: {'Wood': (9, 18),
+                'Sap': (1, 4)},
+
+            3: {'Wood': (26, 40),
+                'Sap': (4, 8)},
+
+            4: {'Wood': (58, 94),
+                'Sap': (10, 18)},
+
+            5: {'Wood': (115, 143),
+                'Sap': (26, 43)}
+        }
+
+        self.current_stage = 2
+        self.resource_value = self.resource_stages[self.current_stage]
+
+        self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.random_tree_positions = {}
         self.rects = {}
 
@@ -36,9 +53,16 @@ class Tree:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 try:
-                    # inventory taiendamine woodiga
-                    wood_amount = random.randint(self.resource_value[0], self.resource_value[1])
-                    self.player.add_items(item_name='Wood', amount=wood_amount)
+
+                    # Lisab saadud itemid invi
+                    resources_collected = {
+                        resource: random.randint(value_range[0], value_range[1])
+                        for resource, value_range in self.resource_value.items()
+                    }
+
+                    # Add each resource to the player's inventory
+                    for resource, amount in resources_collected.items():
+                        self.player.add_items(item_name=resource, amount=amount)
 
                     # removib listidest
                     self.random_tree_positions.pop(position)

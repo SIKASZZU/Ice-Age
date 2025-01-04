@@ -41,8 +41,6 @@ class Render:
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
 
-        self.random_tree_positions = {}
-
         self.ground_surrounding_values = [0, ]
         self.snowy_heated_ground_surrounding_values = [1, 10]
         self.melted_water_values = [0, ]
@@ -150,15 +148,16 @@ class Render:
     def render_after_ground(self, terrain_value, position_by_grid, row_idx, col_idx):
         # tree
         if terrain_value in [10, 110]:
-            if position_by_grid in self.random_tree_positions:
-                position = self.random_tree_positions[position_by_grid]
-                self.random_tree_positions[position_by_grid] = position
+            if position_by_grid in self.tree.random_tree_positions:
+                position = self.tree.random_tree_positions[position_by_grid]
+                # print('position', position)
+                self.tree.random_tree_positions[position_by_grid] = position
 
             else:
                 # Base position without random offset
                 position = (row_idx * self.map.tile_size, col_idx * self.map.tile_size)
-                # Random offset
 
+                # Random offset
                 if random.random() > 0.5:
                     position = (
                         position[0] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
@@ -172,7 +171,7 @@ class Render:
                     )
 
                 # Store tree position in the map (to avoid duplicating)
-                self.random_tree_positions[position_by_grid] = position
+                self.tree.random_tree_positions[position_by_grid] = (round(position[0], 2), round(position[1], 2))
 
             # Append tree image and position
             tree_position = (

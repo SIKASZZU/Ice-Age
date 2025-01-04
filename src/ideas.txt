@@ -1,0 +1,14 @@
+Playeri kohal voiks olla tema inventory voi midagi..
+    Et player naeks kogu aeg palju tal puitu on.
+    Saab teha nii, et = puidu icon X amount_in_inv 
+
+Seal kus player on kondinud, voiks olla tumedam nagu pathway...
+
+Animatsioon kui removid puid.
+    # naiteks 5 korda saab spaceiga puud maha votta
+    # iga kord lihtsalt votab puu ylevalt poolt viiendiku latva maha, kuniks puud enam ei ole voi on k2nd
+
+Kui piisavalt on puitu et teha kas campfire upgrade voi uus campfire ss tuleb mingi nupp kuhugi kohale
+    # naiteks uue campfirei nupp on playeri kohal (campf tekib playeri alla)
+    # naiteks campfire upgrade nupp on placed campfirei kohal
+

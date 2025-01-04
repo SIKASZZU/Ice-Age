@@ -17,7 +17,7 @@ jurigged.watch()
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1920, 1080))  # Set up the game window
+        self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -26,7 +26,7 @@ class Game:
         self.map = Map(self.screen, self.camera)
         self.player = Player(self.screen, self.camera, self.map)
         self.images = Images()
-        self.tree = Tree(self.images, self.map)
+        self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player)
         self.tile_set = TileSet(self.images, self.map)
 
         self.heat_zone = HeatZone(self.screen, self.map, self.camera)

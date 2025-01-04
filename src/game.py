@@ -15,7 +15,7 @@ jurigged.watch()
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1920, 1080))  # Set up the game window
+        self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -27,7 +27,7 @@ class Game:
         self.tree = Tree(self.images, self.map)
         self.tile_set = TileSet(self.images, self.map)
         self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set)
-
+        self.weather = Weather(self.screen, self.player)
 
     def logic(self):
         self.camera.update(self.player.rect)  # Keep camera updated with player position
@@ -39,6 +39,7 @@ class Game:
         self.renderer.update()
         self.player.update()  # Update player and keep them at the center of the screen
         self.tree.update()
+        self.weather.update()
         
         pygame.display.flip()  # LAST // Update display
 

@@ -7,7 +7,7 @@ class TileSet:
         self.images = image
         self.map = map
 
-        self.snowy_ground_tileset_image = self.get_tileset_image('Water_Ground_Tileset', 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground_snowy_water.png')
+        self.snowy_ground_tileset_image = self.get_tileset_image('Water_Ground_Tileset', 'res/images/snowy_ground_snowy_water.png')
         self.snowy_ground_tileset_image = pygame.transform.scale(self.snowy_ground_tileset_image, (6 * self.map.tile_size, 3 * self.map.tile_size))
     def get_tileset_image(self, image_name, image_path):
         return self.images.preloading(image_name, image_path=image_path)

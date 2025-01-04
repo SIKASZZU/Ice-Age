@@ -13,11 +13,11 @@ class Render:
         self.images = images
         self.tile_set = tile_set
 
-        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground.png'
+        path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', path)
         self.ground_image = pygame.transform.scale(self.ground_image, (self.map.tile_size, self.map.tile_size))
 
-        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_water.png'
+        path = 'res/images/snowy_water.png'
         self.water_image = self.images.preloading('water', path)
 
         self.water_image = pygame.transform.scale(self.water_image, (self.map.tile_size, self.map.tile_size))

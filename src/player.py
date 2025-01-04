@@ -38,15 +38,19 @@ class Player:
         """ Add items by name to player's inventory """
         if item_name in self.inv:
             self.inv[item_name] += amount    
-            print(f'Collected {amount} Wood. INV:{self.inv}')
-        else: self.inv[item_name] = amount
+        else: 
+            self.inv[item_name] = amount
 
+        print(f'Collected {amount, item_name}. INV:{self.inv}')
 
     def remove_items(self, item_name, amount=-1):
         """ Remove items by name to player's inventory """
         if item_name in self.inv:    
             self.inv[item_name] += amount
-        else: self.inv[item_name] = amount
+        else: 
+            self.inv[item_name] = amount
+
+        print(f'Removed {amount, item_name}. INV:{self.inv}')
 
 
     def inventory(self):

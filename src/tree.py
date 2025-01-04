@@ -1,6 +1,7 @@
 import pygame
 import random
 
+
 class Tree:
     def __init__(self, screen, images, map, camera, player):
         self.images = images
@@ -12,23 +13,24 @@ class Tree:
         self.width = self.map.tile_size * 1
         self.height = self.map.tile_size * 1.5
 
+        self.total_trees_harvested = 0
         self.resource_stages = {
-            1: {'Wood': (1, 6)},
+            0: {'Wood': (1, 6)},
 
-            2: {'Wood': (9, 18),
-                'Sap': (1, 4)},
+            15: {'Wood': (9, 18),
+                 'Sap': (1, 4)},
 
-            3: {'Wood': (26, 40),
-                'Sap': (4, 8)},
+            35: {'Wood': (26, 40),
+                 'Sap': (4, 8)},
 
-            4: {'Wood': (58, 94),
-                'Sap': (10, 18)},
+            60: {'Wood': (58, 94),
+                 'Sap': (10, 18)},
 
-            5: {'Wood': (115, 143),
-                'Sap': (26, 43)}
+            100: {'Wood': (115, 143),
+                  'Sap': (26, 43)}
         }
 
-        self.current_stage = 2
+        self.current_stage = 0
         self.resource_value = self.resource_stages[self.current_stage]
 
         self.rect = pygame.Rect(0, 0, self.width, self.height)
@@ -38,8 +40,16 @@ class Tree:
         path = 'res/images/snowy_tree.png'
         self.img = self.images.preloading('tree', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
-        
 
+    def change_stage(self):
+
+        # Iterate over stage thresholds in ascending order
+        for threshold in sorted(self.resource_stages.keys()):
+            if self.total_trees_harvested >= threshold:
+                self.current_stage = threshold
+
+        # Update the current resource values for the new stage
+        self.resource_value = self.resource_stages[self.current_stage]
 
     def gather(self):
         # pick uppimine kaib real coordide jargi, mitte windowi
@@ -63,6 +73,8 @@ class Tree:
                     # Add each resource to the player's inventory
                     for resource, amount in resources_collected.items():
                         self.player.add_items(item_name=resource, amount=amount)
+
+                    self.total_trees_harvested += 1
 
                     # removib listidest
                     self.random_tree_positions.pop(position)
@@ -104,5 +116,7 @@ class Tree:
             
 
     def update(self):
+        self.change_stage()
         self.calculate_rects()
         self.gather()
+

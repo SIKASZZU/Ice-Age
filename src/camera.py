@@ -21,5 +21,6 @@ class Camera:
         self.offset.x = target.centerx - self.half_w
         self.offset.y = target.centery - self.half_h
 
+
     def update(self, player):
         self.center_target_camera(player)

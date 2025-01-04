@@ -9,6 +9,7 @@ from player import Player
 from render import Render
 from images import Images
 from tileset import TileSet
+from heat_zone import HeatZone
 
 jurigged.watch()
 
@@ -21,21 +22,21 @@ class Game:
 
         # Initialize game components
         self.camera = Camera()
-        self.player = Player(self.screen, self.camera)
         self.map = Map(self.screen, self.camera)
+        self.player = Player(self.screen, self.camera, self.map)
         self.images = Images()
         self.tree = Tree(self.images, self.map)
         self.tile_set = TileSet(self.images, self.map)
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set)
+        self.heat_zone = HeatZone(self.screen, self.map, self.camera)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
 
 
     def logic(self):
         self.camera.update(self.player.rect)  # Keep camera updated with player position
 
-
     def render(self):
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
-        
+        self.heat_zone.update_heat_zone()
         self.renderer.update()
         self.player.update()  # Update player and keep them at the center of the screen
         self.tree.update()

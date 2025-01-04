@@ -3,7 +3,7 @@ import random
 
 
 class Render:
-    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set):
+    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set, heat_zone):
         self.screen = screen
         self.camera = camera
         self.map = map
@@ -12,24 +12,77 @@ class Render:
         self.tree = tree
         self.images = images
         self.tile_set = tile_set
+        self.heat_zone = heat_zone
 
-        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground.png'
-        self.ground_image = self.images.preloading('ground', path)
+        ground_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground.png'
+        self.ground_image = self.images.preloading('ground', ground_path)
         self.ground_image = pygame.transform.scale(self.ground_image, (self.map.tile_size, self.map.tile_size))
 
-        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_water.png'
-        self.water_image = self.images.preloading('water', path)
-
+        water_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_water.png'
+        self.water_image = self.images.preloading('water', water_path)
         self.water_image = pygame.transform.scale(self.water_image, (self.map.tile_size, self.map.tile_size))
+
+        campfire_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/Campfire.png'
+        self.campfire_image = self.images.preloading('campfire', campfire_path)
+        self.campfire_image = pygame.transform.scale(self.campfire_image, (self.map.tile_size, self.map.tile_size))
+
+        snowy_heated_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_heated_ground.png'
+        self.snowy_heated_image = self.images.preloading('snowy_heated_ground', snowy_heated_path)
+        self.snowy_heated_image = pygame.transform.scale(self.snowy_heated_image, (self.map.tile_size, self.map.tile_size))
+
 
         # listid
         self.water_images = []
         self.ground_images = []
         self.tree_images = []
         self.combined_images = []
+
+        self.heat_source_images = []
+        self.snowy_heated_ground_image = []
+
         self.random_tree_positions = {}
 
-        self.ground_surrounding_values = [0,]
+        self.ground_surrounding_values = [0, ]
+        self.snowy_heated_ground_surrounding_values = [1, 10]
+        self.melted_water_values = [0, ]
+
+        self.static_map_surface = None  # Will hold the entire static map surface
+
+    def create_static_map_surface(self):
+        # Create a new surface to hold the entire map's static tiles
+        width, height = self.map.width * self.map.tile_size, self.map.height * self.map.tile_size
+        self.static_map_surface = pygame.Surface((width, height))
+
+        for row_idx, row in enumerate(self.map.data):
+            for col_idx, terrain_value in enumerate(row):
+                position = (col_idx * self.map.tile_size, row_idx * self.map.tile_size)
+
+                if terrain_value in [0]:
+                    self.static_map_surface.blit(self.water_image, position)
+
+                elif terrain_value in [1, 10, 100, 110, 20]:
+                    ground_image = None
+
+                    if terrain_value in [1, 10]:
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx,
+                                                                        self.ground_surrounding_values)
+                        ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
+                        if not ground_image:
+                            ground_image = self.ground_image
+
+                    if terrain_value in [100, 110, 20]:
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
+                        ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
+
+                        if not ground_image:
+                            surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.melted_water_values)
+                            ground_image = self.tile_set.determine_melted_water_image(surroundings)
+
+                        if not ground_image:
+                            ground_image = self.snowy_heated_image
+
+                    if ground_image:
+                        self.static_map_surface.blit(ground_image, position)
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = {}
@@ -64,49 +117,74 @@ class Render:
                     self.water_images.append((self.water_image, position))
 
                 # terrain
-                elif terrain_value in [1, 10]:
+                elif terrain_value in [1, 10, 100, 110, 20]:
+                    ground_image = None
                     position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
-                    surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
-                    ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
-                    if not ground_image:
-                        ground_image = self.ground_image
+                    if terrain_value in [1, 10]:
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
+                        ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
+                        if not ground_image:
+                            ground_image = self.ground_image
 
-                    self.ground_images.append((ground_image, position))
+                    # TODO: Ground + Melted + Water -> Tilesetti vaja
+                    if terrain_value in [100, 110, 20]:
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
+                        ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
+                        if not ground_image:
+                            surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.melted_water_values)
+                            ground_image = self.tile_set.determine_melted_water_image(surroundings)
 
-                    # tree
-                    if terrain_value in [10]:
-                        if position_by_grid in self.random_tree_positions:
-                            position = self.random_tree_positions[position_by_grid]
-                            self.random_tree_positions[position_by_grid] = position
+                        if not ground_image:
+                            ground_image = self.snowy_heated_image
 
-                        else:
-                            # Base position without random offset
-                            position = (row_idx * self.map.tile_size, col_idx * self.map.tile_size)
-                            # Random offset
+                    self.render_after_ground(terrain_value, position_by_grid, row_idx, col_idx)
 
+                    if ground_image:
+                        self.ground_images.append((ground_image, position))
 
-                            if random.random() > 0.5:
-                                position = (
-                                    position[0] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
-                                    position[1] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2)
-                                )
-
-                            else:
-                                position = (
-                                    position[0] - random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
-                                    position[1] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2)
-                                )
-
-                            # Store tree position in the map (to avoid duplicating)
-                            self.random_tree_positions[position_by_grid] = position
-
-                        # Append tree image and position
-                        tree_position = (position[0] - self.camera.offset.x, position[1] - self.camera.offset.y - self.tree.height // 2)
-                        self.tree_images.append((self.tree.image, tree_position))
-
-        self.combined_images = self.water_images + self.ground_images + self.tree_images
+        self.combined_images = self.water_images + self.ground_images + self.heat_source_images + self.tree_images
         self.screen.blits(self.combined_images, doreturn=False)
+
+
+    def render_after_ground(self, terrain_value, position_by_grid, row_idx, col_idx):
+        # tree
+        if terrain_value in [10, 110]:
+            if position_by_grid in self.random_tree_positions:
+                position = self.random_tree_positions[position_by_grid]
+                self.random_tree_positions[position_by_grid] = position
+
+            else:
+                # Base position without random offset
+                position = (row_idx * self.map.tile_size, col_idx * self.map.tile_size)
+                # Random offset
+
+                if random.random() > 0.5:
+                    position = (
+                        position[0] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
+                        position[1] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2)
+                    )
+
+                else:
+                    position = (
+                        position[0] - random.uniform(self.map.tile_size * 0.05, self.map.tile_size * 0.2),
+                        position[1] + random.uniform(self.map.tile_size * 0.05, self.map.tile_size * 0.2)
+                    )
+
+                # Store tree position in the map (to avoid duplicating)
+                self.random_tree_positions[position_by_grid] = position
+
+            # Append tree image and position
+            tree_position = (
+            position[0] - self.camera.offset.x, position[1] - self.camera.offset.y - self.tree.height // 2)
+
+            self.tree_images.append((self.tree.image, tree_position))
+
+        # heat source
+        if terrain_value in [20]:
+            position = (
+            row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+            self.heat_source_images.append((self.campfire_image, position))
 
 
     def reset_image_lists(self):
@@ -114,6 +192,9 @@ class Render:
         self.ground_images = []
         self.tree_images = []
         self.combined_images = []
+
+        self.heat_source_images = []
+        self.snowy_heated_ground_image = []
 
 
     def render_player(self):
@@ -126,4 +207,5 @@ class Render:
         # self.render_terrain_in_view(self.get_terrain_in_view())
         self.render_terrain_in_view()
         self.render_player()
+
         # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS

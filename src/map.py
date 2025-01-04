@@ -1,21 +1,26 @@
+import random
+
 import numpy as np
 from noise import pnoise2
-
+import random
 
 class Map:
     def __init__(self, screen, camera):
         self.width = 100  # Player saab korraga näha max 20 - (1920 / 100 = 19.2 -> 20)
         self.height = 100  # Player saab korraga näha max 11 - (1080 / 100 = 10.8 -> 11)
-        self.tile_size = 250
+        self.tile_size = 200
         self.screen = screen
         self.camera = camera
 
         # Initialize data with procedural noise
-        self.data = self.generate_data(width=self.width, height=self.height)
+        self.data = self.generate_data(width=self.width, height=self.height, seed=random.randint(1, 500))
 
     @staticmethod
     def generate_data(width, height, scale=50.0, octaves=6, persistence=0.5, lacunarity=2.0, seed=42):
         data = np.zeros((height, width), dtype=int)
+        tree_positions = []
+
+        # Generate terrain
         for y in range(height):
             for x in range(width):
                 noise_value = pnoise2(
@@ -31,12 +36,39 @@ class Map:
 
                 if noise_value > 0.07:
                     data[y, x] = 10  # Trees
+                    tree_positions.append((x, y))
                 elif 0.04 < noise_value <= 0.07 or (0 > noise_value > -0.01):
                     data[y, x] = 1  # Ground
                 elif -0.01 >= noise_value >= -0.03 or (0 < noise_value <= 0.04):
                     data[y, x] = 0  # Ice Water
 
+        # Place heat source near the center of trees
+        if tree_positions:
+            # Calculate approximate center
+            avg_x = sum(pos[0] for pos in tree_positions) // len(tree_positions)
+            avg_y = sum(pos[1] for pos in tree_positions) // len(tree_positions)
+
+            # Find the closest tree to the calculated center
+            closest_tree = min(tree_positions, key=lambda pos: (pos[0] - avg_x) ** 2 + (pos[1] - avg_y) ** 2)
+            heat_x, heat_y = closest_tree
+
+            # Place the heat source at the closest tree
+            data[heat_y, heat_x] = 20  # Heat Source
+
         return data
+
+    def get_terrain_value_positions(self, terrain_value) -> list:
+        return np.argwhere(self.data == terrain_value)  # x, y
+
+    def get_terrain_value_at(self, x, y) -> int:
+        if 0 <= x < self.width and 0 <= y < self.height:
+
+            print(self.data[y, x], y, x)
+            print(self.get_terrain_value_positions(20))
+            return self.data[y, x]
+        else:
+            print(f'Out of bounds or smth - ({x};{y})')
+            return None
 
     def update(self):
         return self.data

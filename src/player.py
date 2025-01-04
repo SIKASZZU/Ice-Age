@@ -1,16 +1,19 @@
 import pygame
 
 class Player:
-    def __init__(self, screen, camera):
+    def __init__(self, screen, camera, map):
         self.screen = screen
         self.camera = camera
+        self.map = map
 
-        self.x = 10
-        self.y = 10
+        player_pos_grid = self.map.get_terrain_value_positions(20)  # 20 -> Torch ID
+
+        self.x = player_pos_grid[0][0] * self.map.tile_size
+        self.y = player_pos_grid[0][1] * self.map.tile_size
         self.height = 50
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.movement_speed = 5
+        self.movement_speed = 50
 
 
     def movement(self):

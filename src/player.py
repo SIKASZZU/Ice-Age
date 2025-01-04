@@ -37,8 +37,8 @@ class Player:
     def add_items(self, item_name, amount=1):
         """ Add items by name to player's inventory """
         if item_name in self.inv:
-            print(f'Collected {amount} Wood. INV:{self.inv}')
             self.inv[item_name] += amount    
+            print(f'Collected {amount} Wood. INV:{self.inv}')
         else: self.inv[item_name] = amount
 
 

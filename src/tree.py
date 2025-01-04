@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Tree:
     def __init__(self, screen, images, map, camera, player):
@@ -35,11 +36,16 @@ class Tree:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 try:
+                    # inventory taiendamine woodiga
+                    wood_amount = random.randint(self.resource_value[0], self.resource_value[1])
+                    self.player.add_items(item_name='Wood', amount=wood_amount)
+
+                    # removib listidest
                     self.random_tree_positions.pop(position)
-                    self.rects.pop(position)  # removib listidest
+                    self.rects.pop(position)
                     self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
-                except Exception: 
-                    print('Tree removing error @ Tree.gather()')
+                except Exception as e: 
+                    print('Tree removing error @ Tree.gather()', e)
                 break  # kui ei breaki, siis error, et self.rects dict changed sizes during iteration.
 
     def spawn(self):

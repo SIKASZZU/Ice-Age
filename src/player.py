@@ -15,6 +15,8 @@ class Player:
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.movement_speed = 5
+        
+        self.inv = {}
 
 
     def movement(self):
@@ -32,5 +34,25 @@ class Player:
         self.rect.y = self.y
 
 
+    def add_items(self, item_name, amount=1):
+        """ Add items by name to player's inventory """
+        if item_name in self.inv:
+            print(f'Collected {amount} Wood. INV:{self.inv}')
+            self.inv[item_name] += amount    
+        else: self.inv[item_name] = amount
+
+
+    def remove_items(self, item_name, amount=-1):
+        """ Remove items by name to player's inventory """
+        if item_name in self.inv:    
+            self.inv[item_name] += amount
+        else: self.inv[item_name] = amount
+
+
+    def inventory(self):
+        pass
+            
+
     def update(self):
         self.movement()
+        self.inventory()

@@ -7,13 +7,13 @@ class TileSet:
         self.images = image
         self.map = map
 
-        self.snowy_ground_tileset_image = self.get_tileset_image('Water_Ground_Tileset', 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground_snowy_water.png')
+        self.snowy_ground_tileset_image = self.get_tileset_image('Water_Ground_Tileset', 'res/images/snowy_ground_snowy_water.png')
         self.snowy_ground_tileset_image = pygame.transform.scale(self.snowy_ground_tileset_image, (6 * self.map.tile_size, 3 * self.map.tile_size))
 
-        self.snowy_ground_snowy_heated_ground_tileset_image = self.get_tileset_image('Snowy_Melted_Ground_Tileset', 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground_snowy_heated_ground.png')
+        self.snowy_ground_snowy_heated_ground_tileset_image = self.get_tileset_image('Snowy_Melted_Ground_Tileset', 'res/images/snowy_ground_snowy_heated_ground.png')
         self.snowy_ground_snowy_heated_ground_tileset_image = pygame.transform.scale(self.snowy_ground_snowy_heated_ground_tileset_image, (6 * self.map.tile_size, 3 * self.map.tile_size))
 
-        melted_water_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/melted_water.png'
+        melted_water_path = 'res/images/melted_water.png'
         self.melted_water_image = self.images.preloading('Melted_Water', melted_water_path)
         self.melted_water_image = pygame.transform.scale(self.melted_water_image, (6 * self.map.tile_size, 3 * self.map.tile_size))
 

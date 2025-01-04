@@ -14,19 +14,20 @@ class Render:
         self.tile_set = tile_set
         self.heat_zone = heat_zone
 
-        ground_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground.png'
+        ground_path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', ground_path)
         self.ground_image = pygame.transform.scale(self.ground_image, (self.map.tile_size, self.map.tile_size))
 
-        water_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_water.png'
+        water_path = 'res/images/snowy_water.png'
         self.water_image = self.images.preloading('water', water_path)
+
         self.water_image = pygame.transform.scale(self.water_image, (self.map.tile_size, self.map.tile_size))
 
-        campfire_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/Campfire.png'
+        campfire_path = 'res/images/Campfire.png'
         self.campfire_image = self.images.preloading('campfire', campfire_path)
         self.campfire_image = pygame.transform.scale(self.campfire_image, (self.map.tile_size, self.map.tile_size))
 
-        snowy_heated_path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_heated_ground.png'
+        snowy_heated_path = 'res/images/snowy_heated_ground.png'
         self.snowy_heated_image = self.images.preloading('snowy_heated_ground', snowy_heated_path)
         self.snowy_heated_image = pygame.transform.scale(self.snowy_heated_image, (self.map.tile_size, self.map.tile_size))
 

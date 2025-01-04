@@ -3,7 +3,7 @@ import random
 
 
 class Render:
-    def __init__(self, screen, camera, map, player, clock, tree, images):
+    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set):
         self.screen = screen
         self.camera = camera
         self.map = map
@@ -11,16 +11,25 @@ class Render:
         self.clock = clock
         self.tree = tree
         self.images = images
+        self.tile_set = tile_set
 
-        path = 'res/images/snow_ground.png'
+        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', path)
+        self.ground_image = pygame.transform.scale(self.ground_image, (self.map.tile_size, self.map.tile_size))
+
+        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_water.png'
+        self.water_image = self.images.preloading('water', path)
+
+        self.water_image = pygame.transform.scale(self.water_image, (self.map.tile_size, self.map.tile_size))
 
         # listid
+        self.water_images = []
         self.ground_images = []
         self.tree_images = []
         self.combined_images = []
         self.random_tree_positions = {}
 
+        self.ground_surrounding_values = [0,]
 
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = {}
@@ -48,34 +57,60 @@ class Render:
         for row_idx, row in enumerate(self.map.data):
             for col_idx, terrain_value in enumerate(row):
                 position_by_grid = (row_idx, col_idx)
-                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
-                
+
                 # water
-                if terrain_value == 0:
-                    pass
+                if terrain_value in [0]:
+                    position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+                    self.water_images.append((self.water_image, position))
 
                 # terrain
-                elif terrain_value == 1:
-                    self.ground_images.append((self.ground_image, position))
-                
-                # tree
-                elif terrain_value == 10:
-                    if position_by_grid in self.random_tree_positions:
-                        position = self.random_tree_positions[position_by_grid]
-                    
-                    else:
-                        if random.random() > 0.4:  position = (position[0] + random.randint(1, 10),  position[1] + random.randint(1, 10))
-                        if random.random() > 0.8:  position = (position[0] - random.randint(1, 10),  position[1] + random.randint(1, 10))
+                elif terrain_value in [1, 10]:
+                    position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
-                        self.random_tree_positions[position_by_grid] = position
+                    surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
+                    ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
+                    if not ground_image:
+                        ground_image = self.ground_image
 
-                    self.tree_images.append((self.tree.image, position))
-                
-        self.combined_images = self.ground_images + self.tree_images
+                    self.ground_images.append((ground_image, position))
+
+                    # tree
+                    if terrain_value in [10]:
+                        if position_by_grid in self.random_tree_positions:
+                            position = self.random_tree_positions[position_by_grid]
+                            self.random_tree_positions[position_by_grid] = position
+
+                        else:
+                            # Base position without random offset
+                            position = (row_idx * self.map.tile_size, col_idx * self.map.tile_size)
+                            # Random offset
+
+
+                            if random.random() > 0.5:
+                                position = (
+                                    position[0] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
+                                    position[1] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2)
+                                )
+
+                            else:
+                                position = (
+                                    position[0] - random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
+                                    position[1] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2)
+                                )
+
+                            # Store tree position in the map (to avoid duplicating)
+                            self.random_tree_positions[position_by_grid] = position
+
+                        # Append tree image and position
+                        tree_position = (position[0] - self.camera.offset.x, position[1] - self.camera.offset.y - self.tree.height // 2)
+                        self.tree_images.append((self.tree.image, tree_position))
+
+        self.combined_images = self.water_images + self.ground_images + self.tree_images
         self.screen.blits(self.combined_images, doreturn=False)
 
 
     def reset_image_lists(self):
+        self.water_images = []
         self.ground_images = []
         self.tree_images = []
         self.combined_images = []
@@ -91,4 +126,4 @@ class Render:
         # self.render_terrain_in_view(self.get_terrain_in_view())
         self.render_terrain_in_view()
         self.render_player()
-        print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS
+        # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS

@@ -10,7 +10,7 @@ class Tree:
         
         self.resource_value = (50, 120)
 
-        path = 'res/images/tree.png'
+        path = 'C:/Users/Olari/Documents/GitHub/Ice-Age/res/images/snowy_tree.png'
         self.img = self.images.preloading('tree', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
         

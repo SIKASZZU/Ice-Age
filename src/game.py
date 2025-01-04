@@ -8,14 +8,14 @@ from camera import Camera
 from player import Player
 from render import Render
 from images import Images
+from tileset import TileSet
 
 jurigged.watch()
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))  # Set up the game window
-        pygame.display.set_caption("Ice Age")
+        self.screen = pygame.display.set_mode((1920, 1080))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -25,7 +25,8 @@ class Game:
         self.map = Map(self.screen, self.camera)
         self.images = Images()
         self.tree = Tree(self.images, self.map)
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images)
+        self.tile_set = TileSet(self.images, self.map)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set)
 
 
     def logic(self):
@@ -52,6 +53,7 @@ class Game:
             self.render()
             self.logic()
             self.clock.tick(6000)  # Limit the game to 60 FPS
+            pygame.display.set_caption(f"Ice Age - {int(self.clock.get_fps())}")
         pygame.quit()
 
 

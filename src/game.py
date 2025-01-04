@@ -17,7 +17,7 @@ jurigged.watch()
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
+        self.screen = pygame.display.set_mode((1920, 1080))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -67,7 +67,6 @@ class Game:
 
             # Display FPS statistics
             fps_text = self.frame_rate.display_fps_statistics()
-            print(fps_text)
             self.clock.tick(5000)  # Limit the game to 60 FPS
             pygame.display.set_caption(f"Ice Age - {fps_text}")
 

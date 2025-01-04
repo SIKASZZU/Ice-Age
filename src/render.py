@@ -88,14 +88,14 @@ class Render:
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = []
         # Determine the player's position on the grid
-        player_grid_x = self.player.x  // self.map.tile_size
-        player_grid_y = self.player.y  // self.map.tile_size
+        player_grid_x = self.player.x // self.map.tile_size
+        player_grid_y = self.player.y // self.map.tile_size
 
-        # Define the render range (10x10 visible tiles)
-        row_range_0 = max(0, player_grid_y - 5)
-        row_range_1 = min(self.map.height, player_grid_y + 6)
-        col_range_0 = max(0, player_grid_x - 10)
-        col_range_1 = min(self.map.width, player_grid_x + 10)
+        # Define the render range (11x6 visible tiles)
+        row_range_0 = max(0, player_grid_y - 3)  # 6 tiles: 3 above and 3 below
+        row_range_1 = min(self.map.height, player_grid_y + 5)
+        col_range_0 = max(0, player_grid_x - 5)  # 11 tiles: 5 to the left and 5 to the right
+        col_range_1 = min(self.map.width, player_grid_x + 6)
 
         # Collect terrain data within the render range
         for row in range(row_range_0, row_range_1):

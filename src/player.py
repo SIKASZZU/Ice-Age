@@ -67,14 +67,16 @@ class Player:
         # for item in self.inv:
         #     print(item)
         if item not in self.inv:
-            return
-        
-        text_amount = str(self.inv[item])
+            text_amount = '0'
+
+        else:
+            text_amount = str(self.inv[item])
 
         text_surface = self.font.render(text_amount, True, 'gray')
         text_rect = text_surface.get_rect(center=(self.screen.get_width() // 2 + 35, self.screen.get_height() // 2 - 70))
-        # log_rect  = text_surface.get_rect(center=(self.screen.get_width() // 2 - 35, self.screen.get_height() // 2 - 65))
 
+
+        # log_rect  = text_surface.get_rect(center=(self.screen.get_width() // 2 - 35, self.screen.get_height() // 2 - 65))
         self.screen.blit(self.tree_log_image, (self.screen.get_width() // 2 - 70, self.screen.get_height() // 2 - 100))
         self.screen.blit(text_surface, text_rect)
 

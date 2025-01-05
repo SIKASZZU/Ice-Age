@@ -31,7 +31,7 @@ class Game:
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.heat_zone = HeatZone(self.screen, self.map, self.camera)
+        self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player)
         self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
@@ -44,12 +44,11 @@ class Game:
 
     def render(self):
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
-        self.heat_zone.update_heat_zone()
         self.renderer.update()
         self.tree.update()
         self.player.update()  # Update player and keep them at the center of the screen
         self.weather.update()
-        
+        self.heat_zone.update()
         pygame.display.flip()  # LAST // Update display
 
     def run(self):
@@ -59,6 +58,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Left mouse button click
+                        mouse_pos = pygame.mouse.get_pos()  # Get mouse position on click
+                        self.heat_zone.feed_heat_source(mouse_pos)
 
             self.render()
             self.logic()

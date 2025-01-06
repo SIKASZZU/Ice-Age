@@ -20,16 +20,36 @@ class Render:
 
         water_path = 'res/images/snowy_water.png'
         self.water_image = self.images.preloading('water', water_path)
-
         self.water_image = pygame.transform.scale(self.water_image, (self.map.tile_size, self.map.tile_size))
-
-        campfire_path = 'res/images/Campfire.png'
-        self.campfire_image = self.images.preloading('campfire', campfire_path)
-        self.campfire_image = pygame.transform.scale(self.campfire_image, (self.map.tile_size, self.map.tile_size))
 
         snowy_heated_path = 'res/images/snowy_heated_ground.png'
         self.snowy_heated_image = self.images.preloading('snowy_heated_ground', snowy_heated_path)
         self.snowy_heated_image = pygame.transform.scale(self.snowy_heated_image, (self.map.tile_size, self.map.tile_size))
+
+
+        torch_path = 'res/images/torch.png'
+        self.torch_image = self.images.preloading('torch', torch_path)
+        self.torch_image = pygame.transform.scale(self.torch_image, (self.map.tile_size, self.map.tile_size))
+
+        firepit_path = 'res/images/firepit.png'
+        self.firepit_image = self.images.preloading('firepit', firepit_path)
+        self.firepit_image = pygame.transform.scale(self.firepit_image, (self.map.tile_size, self.map.tile_size))
+
+        campfire_path = 'res/images/campfire.png'
+        self.campfire_image = self.images.preloading('campfire', campfire_path)
+        self.campfire_image = pygame.transform.scale(self.campfire_image, (self.map.tile_size, self.map.tile_size))
+
+        bonfire_path = 'res/images/bonfire.png'
+        self.bonfire_image = self.images.preloading('bonfire', bonfire_path)
+        self.bonfire_image = pygame.transform.scale(self.bonfire_image, (self.map.tile_size, self.map.tile_size))
+
+        furnace_path = 'res/images/furnace.png'
+        self.furnace_image = self.images.preloading('furnace', furnace_path)
+        self.furnace_image = pygame.transform.scale(self.furnace_image, (self.map.tile_size, self.map.tile_size))
+
+        blast_furnace_path = 'res/images/blast_furnace.png'
+        self.blast_furnace_image = self.images.preloading('blast_furnace', blast_furnace_path)
+        self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
 
         # listid
@@ -91,9 +111,9 @@ class Render:
 
         # Define the render range (11x6 visible tiles)
         row_range_0 = max(0, player_grid_y - 3)  # 6 tiles: 3 above and 3 below
-        row_range_1 = min(self.map.height, player_grid_y + 5)
+        row_range_1 = min(self.map.height, player_grid_y + 5)  # 5
         col_range_0 = max(0, player_grid_x - 5)  # 11 tiles: 5 to the left and 5 to the right
-        col_range_1 = min(self.map.width, player_grid_x + 6)
+        col_range_1 = min(self.map.width, player_grid_x + 6)  # 6
 
         # Collect terrain data within the render range
         for row in range(row_range_0, row_range_1):
@@ -115,7 +135,7 @@ class Render:
                 self.water_images.append((self.water_image, position))
 
             # terrain
-            elif terrain_value in [1, 10, 100, 110, 20]:
+            elif terrain_value in [1, 10, 100, 110, 20, 25, 30, 35, 40, 45]:
                 ground_image = None
                 position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
@@ -126,7 +146,7 @@ class Render:
                         ground_image = self.ground_image
 
                 # TODO: Ground + Melted + Water -> Tilesetti vaja
-                if terrain_value in [100, 110, 20]:
+                if terrain_value in [100, 110, 20, 25, 30, 35, 40, 45]:
                     surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
                     ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
                     if not ground_image:
@@ -180,10 +200,23 @@ class Render:
             self.tree_images.append((self.tree.image, tree_position))
 
         # heat source
-        if terrain_value in [20]:
-            position = (
-            row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
-            self.heat_source_images.append((self.campfire_image, position))
+        if terrain_value in [20, 25, 30, 35, 40, 45]:
+            image = None
+            if terrain_value == 20:
+                image = self.torch_image
+            if terrain_value == 25:
+                image = self.firepit_image
+            if terrain_value == 30:
+                image = self.campfire_image
+            if terrain_value == 35:
+                image = self.bonfire_image
+            if terrain_value == 40:
+                image = self.furnace_image
+            if terrain_value == 45:
+                image = self.blast_furnace_image
+
+            position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
+            self.heat_source_images.append((image, position))
 
 
     def reset_image_lists(self):

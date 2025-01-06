@@ -21,7 +21,7 @@ class Player:
         self.inv = {}
         tree_logs_path = 'res/images/wood_icon.png'
         tree_log_img = self.images.preloading('log', tree_logs_path)
-        self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height)) 
+        self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))
 
 
     def movement(self):
@@ -46,16 +46,18 @@ class Player:
         else: 
             self.inv[item_name] = amount
 
-        print(f'Collected {amount, item_name}. INV:{self.inv}')
+        # print(f'Collected {amount, item_name}. INV:{self.inv}')
 
     def remove_items(self, item_name, amount=-1):
         """ Remove items by name to player's inventory """
-        if item_name in self.inv:    
-            self.inv[item_name] += amount
-        else: 
-            self.inv[item_name] = amount
+        if item_name in self.inv:
+            self.inv[item_name] -= amount
+            print(f'Removed {amount, item_name}. INV:{self.inv}')
+            return True
+        else:
+            print(f'{item_name} not in INV:{self.inv}')
+            return False
 
-        print(f'Removed {amount, item_name}. INV:{self.inv}')
 
 
     def inventory_display(self):

@@ -2,16 +2,17 @@ import pygame
 
 
 class HeatZone:
-    def __init__(self, screen, map, camera, player):
+    def __init__(self, screen, map, camera, player, images):
         self.map = map
         self.camera = camera
         self.screen = screen
         self.player = player
+        self.images = images
 
         self.fire_source_dict = {}
 
         # self.fire_source_dict = {
-        # position {
+        # position: {
         # 'stage': "Torch",
         # 'count': 0,
         # 'position': self.fire_source_grid,
@@ -24,25 +25,38 @@ class HeatZone:
             'Torch': 1,           # ID 20
             'Firepit': 2,         # ID 25
             'Campfire': 3,        # ID 30
-            'Bonfire': 5,         # ID 35
-            'Furnace': 7,         # ID 40
-            'Blast Furnace': 9,   # ID 45
+            'Bonfire': 4,         # ID 35
+            'Furnace': 6,         # ID 40
+            'Blast Furnace': 8,   # ID 45
+        }
+
+        self.heat_zones_id_dict: dict = {
+            'Torch': 20,
+            'Firepit': 25,
+            'Campfire': 30,
+            'Bonfire': 35,
+            'Furnace': 40,
+            'Blast Furnace': 45,
         }
 
         self.heat_zone_stages = {
-            'Torch': 25,
-            'Firepit': 60,
-            'Campfire': 150,
-            'Bonfire': 500,
-            'Furnace': 1600,
-            'Blast Furnace': 4000,
+            'Torch': 15,
+            'Firepit': 30,
+            'Campfire': 60,
+            'Bonfire': 120,
+            'Furnace': 240,
+            'Blast Furnace': 480
         }
+
+        self.allow_new_heat_source_list = 'Blast Furnace', 'Furnace', 'Bonfire', 'Campfire', 'Firepit', 'Torch'
+        self.radius = 0
+        self.new_heat_source = "Torch"
+        self.new_heat_source_cost = 8  # Wood
 
         self.all_fire_source_list = self.map.get_terrain_value_positions(20)
 
         self.fire_source_grid = self.all_fire_source_list[0][0], self.all_fire_source_list[0][1]
         self.fire_source = (self.fire_source_grid[0] * self.map.tile_size, self.fire_source_grid[1] * self.map.tile_size)
-
 
         first_stage_dict = {
             'stage': "Torch",
@@ -53,18 +67,21 @@ class HeatZone:
 
         self.fire_source_dict[self.fire_source_grid] = first_stage_dict
 
-        self.radius = 0
-        self.current_heat_source = "Torch"
-        self.get_radius(self.current_heat_source)
+        # ---- Progressbar ---- #
+        self.height = 50
+        self.width = 50
 
-        # Progress bar settings
+        tree_logs_path = 'res/images/wood_icon.png'
+        tree_log_img = self.images.preloading('log', tree_logs_path)
+        self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))
+        self.progress_bar_image = self.tree_log_image
+
+        # Load progress bar images
+        self.progress_bar_background = self.tree_log_image
+        self.progress_bar_foreground = self.tree_log_image
+
         self.progress_bar_height = 10
         self.progress_bar_width = 100
-
-
-    def get_radius(self, current_heat_source):
-        self.current_heat_source = current_heat_source
-        self.radius = self.heat_zones_dict[self.current_heat_source]  # 2
 
 
     def update_heat_zone(self):
@@ -95,44 +112,113 @@ class HeatZone:
     def feed_heat_source(self, mouse_pos):
         for pos, rect in self.fire_source_rect_list:
             if rect.collidepoint(mouse_pos):
-                self.perform_action_on_fire_source(pos)
+                self.upgrade_fire_source_stage(pos)
                 break
 
-    def perform_action_on_fire_source(self, pos):
-        item = 'Wood'
 
-        if item not in self.player.inv:
-            return
+    def draw_heat_source_cost(self, tree_pos, required_wood):
+        # Set up the text
+        font = pygame.font.Font(None, 45)  # Font and size
+        text = f"{required_wood}"  # Cost as string
 
-        self.fire_source_dict[pos]['count'] += self.player.inv[item]
-        self.player.inv[item] = 0
+        if 'Wood' in self.player.inv and self.player.inv['Wood'] >= required_wood:
+            text_color = (0, 255, 0)  # Green text
+        else:
+            text_color = (255, 0, 0)  # Red text
 
-        self.upgrade_fire_source_stage(pos)
+
+        text_surface = font.render(text, True, text_color)
+
+        # Set up the icon (assuming you have a wood icon loaded)
+        tree_log_img = self.images.loaded_item_images['log']
+        wood_icon = pygame.transform.scale(tree_log_img, (self.width, self.height))
+        icon_rect = wood_icon.get_rect()
+
+        # Position the text and icon
+        x, y = tree_pos
+        text_rect = text_surface.get_rect(center=(x + 70, y - 100))  # Above the tree
+        icon_rect.midleft = text_rect.midright  # Icon next to the text
+
+        # Blit both text and icon
+        self.screen.blit(text_surface, text_rect)
+        self.screen.blit(wood_icon, icon_rect)
+
+    def display_new_heat_source_cost(self, mouse_pos, tree_rect_dict, random_tree_positions, required_wood):
+        for pos, rect in tree_rect_dict.items():
+            if rect.collidepoint(mouse_pos):  # Check if mouse is over the tree
+                terrain_pos = random_tree_positions.get(pos)  # Safely get the terrain position
+                if terrain_pos:
+                    new_pos = terrain_pos[0] - self.camera.offset.x, terrain_pos[1] - self.camera.offset.y
+                    self.draw_heat_source_cost(new_pos, required_wood)
+                return  # Exit after the first match
 
 
     def upgrade_fire_source_stage(self, pos):
         current_stage = self.fire_source_dict[pos]['stage']
         current_count = self.fire_source_dict[pos]['count']
 
-        # Get all the stages in order
-        stages = list(self.heat_zone_stages.keys())
+        if current_stage is list(self.heat_zones_dict.keys())[-1]:  # Vaatab viimast fire source stage'i
+            return
 
-        # Find the index of the current stage
-        current_index = stages.index(current_stage)
+        item = 'Wood'
 
-        # Check if we can upgrade to the next stage
-        if current_index < len(stages) - 1:  # Ensure we are not at the last stage
-            next_stage = stages[current_index + 1]
+        if item not in self.player.inv or self.player.inv[item] <= 0:
+            return  # No wood in inventory to feed
 
-            # Check if the count exceeds the current stage's limit
-            if current_count > self.heat_zone_stages[current_stage]:
+        # Get the required amount to upgrade
+        required_to_upgrade = self.heat_zone_stages[current_stage] - current_count
+
+        # Determine how much wood to use
+        wood_to_use = min(self.player.inv[item], required_to_upgrade)
+
+        # Update the fire source count and reduce player inventory
+        self.fire_source_dict[pos]['count'] += wood_to_use
+        self.player.inv[item] -= wood_to_use
+        # Check if the fire source is ready to upgrade
+        if self.fire_source_dict[pos]['count'] >= self.heat_zone_stages[current_stage]:
+            # Get all the stages in order
+            stages = list(self.heat_zone_stages.keys())
+
+
+            # Find the index of the current stage
+            current_index = stages.index(current_stage)
+
+            if current_index < len(stages) - 1:  # Ensure we are not at the last stage
                 # Upgrade to the next stage
+                next_stage = stages[current_index + 1]
                 self.fire_source_dict[pos]['stage'] = next_stage
-                self.fire_source_dict[pos]['count'] = 0  # Reset count for the new stage
-                print(f"Fire source at {pos} upgraded to {next_stage}!")
 
-    def create_new_heat_source(self):
-        ...
+                # Remove the amount needed for this upgrade from the count
+                self.fire_source_dict[pos]['count'] -= self.heat_zone_stages[current_stage]
+
+                self.map.data[pos] = self.heat_zones_id_dict[next_stage]
+
+
+    def create_new_heat_source(self, mouse_pos, tree_rect_dict):
+        # Check if all fire sources are fully upgraded
+        for pos in self.fire_source_dict:
+            stage = self.fire_source_dict[pos]['stage']
+            if stage not in self.allow_new_heat_source_list:
+                return  # Exit if any source is not fully upgraded
+
+        # Check for interaction with a tree to create a new fire source
+        for tree_pos, tree_rect in tree_rect_dict.items():
+            if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
+                # Add a new fire source at the tree's position
+                new_fire_source = {
+                    'stage': 'Torch',
+                    'count': 0,
+                    'position': tree_pos,
+                    'rect': pygame.Rect(
+                        tree_rect.x, tree_rect.y, self.map.tile_size, self.map.tile_size
+                    )
+                }
+                self.fire_source_dict[tree_pos] = new_fire_source
+
+                # Remove the tree from the tree rect dictionary
+                del tree_rect_dict[tree_pos]
+                return tree_pos
+        return None
 
 
     def create_heat_zone_rect_list(self):
@@ -145,44 +231,58 @@ class HeatZone:
             self.fire_source_rect_list.append(((x, y), rect))
             self.fire_source_dict[pos]['rect'] = rect
 
+    # ------- DRAWING ------- #
     def draw_heat_zones(self):
         """Draw all the heat zone rectangles."""
         for _, rect in self.fire_source_rect_list:
             pygame.draw.rect(self.screen, (0, 0, 0), rect, 10)  # Example: Draw in red color
 
 
-    def draw(self):
-        # for rect in self.fire_source_rect_list:
-        ...
+    def draw_progress_bar(self, rect, progress, max_progress):
+        progress_percent = min(max(progress / max_progress, 0), 1)
 
-        # # Draw the heat zone rect
-        # heat_zone_rect = self.get_heat_zone_rect()
-        # pygame.draw.rect(self.screen, (255, 0, 0), heat_zone_rect, 2)  # Red outline for the heat zone
-        #
-        # # Draw the progress bar above the heat zone
-        # progress_bar_rect = pygame.Rect(
-        #     self.fire_source[0] - self.progress_bar_width // 2,
-        #     self.fire_source[1] - self.radius * self.map.tile_size - self.progress_bar_height - 10,
-        #     self.progress_bar_width,
-        #     self.progress_bar_height
-        # )
-        #
-        # # Draw the background of the progress bar (gray)
-        # pygame.draw.rect(self.screen, (150, 150, 150), progress_bar_rect)
-        #
-        # # Draw the progress (based on radius)
-        # progress = self.radius / 9  # Max radius from the heat zone dict is 9 (from 'Blast Furnace')
-        # progress_width = int(self.progress_bar_width * progress)
-        # pygame.draw.rect(self.screen, (0, 255, 0), pygame.Rect(progress_bar_rect.x, progress_bar_rect.y, progress_width, self.progress_bar_height))
-        #
-        # # Draw the text for progress bar (optional)
-        # font = pygame.font.Font(None, 24)
-        # progress_text = f"Heat Zone: {self.radius}"
-        # text_surface = font.render(progress_text, True, (255, 255, 255))
-        # self.screen.blit(text_surface, (progress_bar_rect.x + 5, progress_bar_rect.y - 25))  # Text above the progress bar
+        # Position to draw progress bar
+        bar_width, bar_height = self.progress_bar_background.get_size()
+        bar_x = rect.centerx - bar_width // 2
+        bar_y = rect.top - bar_height - 5  # 5px padding above the rect
+
+        # Blit the low-transparency background image
+        low_transparency_bar = self.progress_bar_background.copy()
+        low_transparency_bar.set_alpha(100)  # Low transparency (100/255)
+        self.screen.blit(low_transparency_bar, (bar_x, bar_y))
+
+        # Calculate the visible height of the foreground image
+        visible_height = int(bar_height * progress_percent)
+        if visible_height > 0:
+            # Create a subsurface for the visible part of the foreground
+            visible_part = self.progress_bar_foreground.subsurface(
+                pygame.Rect(0, bar_height - visible_height, bar_width, visible_height)
+            )
+            # Position the visible part to appear growing from the bottom
+            visible_y = bar_y + bar_height - visible_height
+            self.screen.blit(visible_part, (bar_x, visible_y))
+
+
+    def draw_all_progress_bars(self, get_terrain_in_view):
+        """Draw progress bars for all fire sources."""
+        for fire_source in self.fire_source_dict.values():
+            position = fire_source['position']
+
+            if position in get_terrain_in_view:
+                rect = fire_source['rect']
+                count = fire_source['count']
+                stage = fire_source['stage']
+                max_count = self.heat_zone_stages[stage]
+
+                if stage is "Blast Furnace":
+                    continue
+
+                # Draw the layered progress bar
+                self.draw_progress_bar(rect, count, max_count)
 
 
     def update(self):
         self.update_heat_zone()
         self.create_heat_zone_rect_list()
-        self.draw_heat_zones()
+        # self.draw_heat_zones()
+

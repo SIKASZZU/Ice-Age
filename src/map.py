@@ -35,10 +35,15 @@ class Map:
                 )
 
                 if noise_value > 0.07:
+                    if 4 > random.randint(0, 10):
+                        data[y, x] = 1  # Ground
+                        continue
+
                     data[y, x] = 10  # Trees
                     tree_positions.append((x, y))
                 elif 0.04 < noise_value <= 0.07 or (0 > noise_value > -0.01):
                     data[y, x] = 1  # Ground
+
                 elif -0.01 >= noise_value >= -0.03 or (0 < noise_value <= 0.04):
                     data[y, x] = 0  # Ice Water
 
@@ -57,8 +62,17 @@ class Map:
 
         return data
 
-    def get_terrain_value_positions(self, terrain_value) -> list:
-        return np.argwhere(self.data == terrain_value)  # x, y
+    def get_terrain_value_positions(self, target_value) -> list:
+        if isinstance(target_value, int):  # Single value case
+            return np.argwhere(self.data == target_value).tolist()  # Convert to list for consistency
+
+        if isinstance(target_value, (tuple, list)):  # Multiple values case
+            target_value_pos_list = []
+            for terrain_value in target_value:
+                target_value_pos_list.extend(np.argwhere(self.data == terrain_value).tolist())
+            return target_value_pos_list
+
+        raise ValueError("target_value must be an int, tuple, or list")
 
     def get_terrain_value_at(self, x, y) -> int:
         if 0 <= x < self.width and 0 <= y < self.height:

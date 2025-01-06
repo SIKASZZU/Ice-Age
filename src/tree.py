@@ -3,59 +3,76 @@ import random
 
 
 class Tree:
-    def __init__(self, screen, images, map, camera, player):
+    def __init__(self, screen, images, map, camera, player, heat_zone):
         self.images = images
         self.map = map
         self.screen = screen
         self.camera = camera
         self.player = player
+        self.heat_zone = heat_zone
 
         self.width = self.map.tile_size * 1
         self.height = self.map.tile_size * 1.5
 
         self.total_trees_harvested = 0
         self.resource_stages = {
-            0: {'Wood': (1, 6)},
+            'Torch': {
+                'Wood': (1, 2)},
 
-            15: {'Wood': (9, 18),
-                 'Sap': (1, 4)},
+            'Firepit': {
+                'Wood': (2, 3)},
 
-            35: {'Wood': (26, 40),
-                 'Sap': (4, 8)},
+            'Campfire': {
+                'Wood': (3, 4),
+                'Sap': (4, 6)},
 
-            60: {'Wood': (58, 94),
-                 'Sap': (10, 18)},
+            'Bonfire': {
+                'Wood': (4, 6),
+                'Sap': (2, 4)},
 
-            100: {'Wood': (115, 143),
-                  'Sap': (26, 43)}
+            'Furnace': {
+                'Wood': (5, 7),
+                'Sap': (3, 6)},
+
+            'Blast Furnace': {
+                'Wood': (6, 9),
+                'Sap': (4, 8)}
         }
 
-        self.current_stage = 0
-        self.resource_value = self.resource_stages[self.current_stage]
+        self.resource_value = self.heat_zone.fire_source_dict[self.heat_zone.fire_source_grid]['stage']
+
 
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.random_tree_positions = {}
-        self.rects = {}
+        self.random_tree_positions = {}  # grid: pos
+        self.tree_rect_dict = {}  # grid: rect
+        self.rects = {}  # grid: pos
 
         path = 'res/images/snowy_tree.png'
         self.img = self.images.preloading('tree', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
 
     def change_stage(self):
+        current_heat_source_stage = self.heat_zone.fire_source_dict[self.heat_zone.fire_source_grid]['stage']
+        if current_heat_source_stage in self.resource_stages:
+            self.resource_value = self.resource_stages[current_heat_source_stage]
+        else:
+            self.resource_value = {}
 
-        # Iterate over stage thresholds in ascending order
-        for threshold in sorted(self.resource_stages.keys()):
-            if self.total_trees_harvested >= threshold:
-                self.current_stage = threshold
+    def gather(self, position=None, required_wood=None):
+        if position:
+            self.player.remove_items(item_name='Wood', amount=required_wood)
 
-        # Update the current resource values for the new stage
-        self.resource_value = self.resource_stages[self.current_stage]
+            # removib listidest
+            self.random_tree_positions.pop(position)
+            self.rects.pop(position)
+            self.map.data[position[0]][position[1]] = 20  # muudab terrain value puu asemel fireplace
+            self.heat_zone.all_fire_source_list = self.map.get_terrain_value_positions((20, 25, 30, 35, 40, 45))
 
-    def gather(self):
+            return True
+
         # pick uppimine kaib real coordide jargi, mitte windowi
         for tree in self.rects.items():
             position, tree_rect = tree
-            #print(self.player.rect, tree_rect)
             if not self.player.rect.colliderect(tree_rect):
                 continue
 
@@ -90,12 +107,13 @@ class Tree:
 
     def calculate_rects(self):
         """Draws the trees at their positions."""
-        
+        self.tree_rect_dict = {}   # Reset
+
         # draw rect kaib windowi jargi.
         for position, coord in self.random_tree_positions.items():
             # FIXME: siin teha niimodi et ta ei arvutaks alati recti uuesti.
-                # ehk if position in self.rects: ss youkknowww
-            half_width, half_height =  self.width // 5, self.height // 2
+            # ehk if position in self.rects: ss youkknowww
+            half_width, half_height = self.width // 5, self.height // 2
             
             # need vaartused tunduvad vb lambised, aga need on mul tapselt vaadatud maitse jargi.
             # kui tree rect tundub perses ss x,y width ja height on su parimad sobrad
@@ -103,20 +121,27 @@ class Tree:
             y = round(coord[1], 2)
 
             width = round(self.width - half_width * 2, 2)
-            height = round(self.height - half_height // 1.1, 2)
+            height = round(self.height - half_height // 1.5, 2)
 
-            # JOONISTAMISEKS AINULT
+            # Rect listi tegemine
             x_for_rect = round(coord[0] - self.camera.offset.x + half_width, 2)
-            y_for_rect = round(coord[1] - self.camera.offset.y, 2)
-            pygame.draw.rect(self.screen, 'red', (x_for_rect, y_for_rect, width, height), 2)
-            ###
+            y_for_rect = round(coord[1] - self.camera.offset.y - half_height // 1.8, 2)
+            self.tree_rect_dict[position] = pygame.Rect(x_for_rect, y_for_rect, width, height)
 
             tree_rect = (x, y, width, height)
-            if position not in self.rects:  self.rects[position] = tree_rect
-            
+            if position not in self.rects:
+                self.rects[position] = tree_rect
+
+        # Drawing tree rects
+        # for pos in self.tree_rect_dict:
+        #     pygame.draw.rect(self.screen, 'red', self.tree_rect_dict[pos], 2)
+
+        return
+
 
     def update(self):
         self.change_stage()
         self.calculate_rects()
         self.gather()
 
+        return self.tree_rect_dict, self.random_tree_positions

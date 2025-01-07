@@ -14,6 +14,7 @@ from framerate import Framerate
 
 jurigged.watch()
 
+
 class Game:
     def __init__(self):
         pygame.init()

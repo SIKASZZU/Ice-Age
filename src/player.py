@@ -1,4 +1,5 @@
 import pygame
+from sprite import Sprite
 
 
 class Player:
@@ -23,17 +24,69 @@ class Player:
         tree_log_img = self.images.preloading('log', tree_logs_path)
         self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))
 
+        self.animations = {
+            "idle_left": Sprite("res/images/Idle_Left.png", 130, 130, 4, 5),
+            "idle_right": Sprite("res/images/Idle_Right.png", 130, 130, 4, 5),
+            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, 5),
+            "idle_down": Sprite("res/images/Idle_Down.png", 130, 130, 4, 5),
+
+            "move_left": Sprite("res/images/Left.png", 130, 130, 4, 5),
+            "move_right": Sprite("res/images/Right.png", 130, 130, 4, 5),
+            "move_up": Sprite("res/images/Up.png", 130, 130, 4, 5),
+            "move_down": Sprite("res/images/Down.png", 130, 130, 4, 5),
+        }
+
+        self.last_input = "s"
+
+        self.current_animation = "idle_down"
+        self.speed = 5
+
 
     def movement(self):
+        moving = False
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
             self.x -= self.movement_speed
+            self.current_animation = "move_left"
+            self.last_input = "a"
+            moving = True
+
         if keys[pygame.K_d]:
             self.x += self.movement_speed
+            self.current_animation = "move_right"
+            self.last_input = "d"
+            moving = True
+
         if keys[pygame.K_w]:
             self.y -= self.movement_speed
+            self.current_animation = "move_up"
+            self.last_input = "w"
+            moving = True
+
         if keys[pygame.K_s]:
             self.y += self.movement_speed
+            self.current_animation = "move_down"
+            self.last_input = "s"
+            moving = True
+
+        if keys[pygame.K_a] and keys[pygame.K_d] and keys[pygame.K_w] and keys[pygame.K_s]:
+            self.current_animation = "idle_down"
+            moving = True
+
+        if not moving:
+            if self.last_input == "a":
+                self.current_animation = "idle_left"
+
+            if self.last_input == "d":
+                self.current_animation = "idle_right"
+
+            if self.last_input == "w":
+                self.current_animation = "idle_up"
+
+            if self.last_input == "s":
+                self.current_animation = "idle_down"
+
 
         self.rect.x = self.x
         self.rect.y = self.y
@@ -86,4 +139,11 @@ class Player:
 
     def update(self):
         self.movement()
+        self.animations[self.current_animation].update()
+
+        animation_x = self.x - self.camera.offset.x
+        animation_y = self.y - self.camera.offset.y
+        self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
+
+
         self.inventory_display()

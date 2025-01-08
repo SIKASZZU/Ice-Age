@@ -24,22 +24,23 @@ class Player:
         tree_log_img = self.images.preloading('log', tree_logs_path)
         self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))
 
-        self.animations = {
-            "idle_left": Sprite("res/images/Idle_Left.png", 130, 130, 4, 5),
-            "idle_right": Sprite("res/images/Idle_Right.png", 130, 130, 4, 5),
-            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, 5),
-            "idle_down": Sprite("res/images/Idle_Down.png", 130, 130, 4, 5),
-
-            "move_left": Sprite("res/images/Left.png", 130, 130, 4, 5),
-            "move_right": Sprite("res/images/Right.png", 130, 130, 4, 5),
-            "move_up": Sprite("res/images/Up.png", 130, 130, 4, 5),
-            "move_down": Sprite("res/images/Down.png", 130, 130, 4, 5),
-        }
-
+        # Animation
         self.last_input = "s"
 
         self.current_animation = "idle_down"
-        self.speed = 5
+        self.animation_speed = 5
+        
+        self.animations = {
+            "idle_left": Sprite("res/images/Idle_Left.png", 130, 130, 4, self.animation_speed),
+            "idle_right": Sprite("res/images/Idle_Right.png", 130, 130, 4, self.animation_speed),
+            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, self.animation_speed,
+            "idle_down": Sprite("res/images/Idle_Down.png", 130, 130, 4, self.animation_speed),
+
+            "move_left": Sprite("res/images/Left.png", 130, 130, 4, self.animation_speed),
+            "move_right": Sprite("res/images/Right.png", 130, 130, 4, self.animation_speed),
+            "move_up": Sprite("res/images/Up.png", 130, 130, 4, self.animation_speed),
+            "move_down": Sprite("res/images/Down.png", 130, 130, 4, self.animation_speed),
+        }
 
 
     def movement(self):

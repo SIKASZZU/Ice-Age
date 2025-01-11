@@ -133,8 +133,8 @@ class Tree:
                 self.rects[position] = tree_rect
 
         # Drawing tree rects
-        # for pos in self.tree_rect_dict:
-        #     pygame.draw.rect(self.screen, 'red', self.tree_rect_dict[pos], 2)
+        for pos in self.tree_rect_dict:
+            pygame.draw.rect(self.screen, 'red', self.tree_rect_dict[pos], 2)
 
         return
 

@@ -18,7 +18,7 @@ jurigged.watch()
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1920, 1080))  # Set up the game window
+        self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True
         self.font = pygame.font.Font(None, 50)

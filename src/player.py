@@ -33,7 +33,7 @@ class Player:
         self.animations = {
             "idle_left": Sprite("res/images/Idle_Left.png", 130, 130, 4, self.animation_speed),
             "idle_right": Sprite("res/images/Idle_Right.png", 130, 130, 4, self.animation_speed),
-            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, self.animation_speed,
+            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, self.animation_speed),
             "idle_down": Sprite("res/images/Idle_Down.png", 130, 130, 4, self.animation_speed),
 
             "move_left": Sprite("res/images/Left.png", 130, 130, 4, self.animation_speed),

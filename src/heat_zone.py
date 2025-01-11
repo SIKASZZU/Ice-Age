@@ -22,12 +22,12 @@ class HeatZone:
         self.fire_source_rect_list = []
 
         self.heat_zones_dict: dict = {
-            'Torch': 1,           # ID 20
-            'Firepit': 2,         # ID 25
-            'Campfire': 3,        # ID 30
-            'Bonfire': 4,         # ID 35
-            'Furnace': 6,         # ID 40
-            'Blast Furnace': 8,   # ID 45
+            'Torch': 0,           # ID 20
+            'Firepit': 1,         # ID 25
+            'Campfire': 2,        # ID 30
+            'Bonfire': 3,         # ID 35
+            'Furnace': 4,         # ID 40
+            'Blast Furnace': 6,   # ID 45
         }
 
         self.heat_zones_id_dict: dict = {
@@ -143,6 +143,7 @@ class HeatZone:
         self.screen.blit(text_surface, text_rect)
         self.screen.blit(wood_icon, icon_rect)
 
+
     def display_new_heat_source_cost(self, mouse_pos, tree_rect_dict, random_tree_positions, required_wood):
         for pos, rect in tree_rect_dict.items():
             if rect.collidepoint(mouse_pos):  # Check if mouse is over the tree
@@ -231,16 +232,22 @@ class HeatZone:
             self.fire_source_rect_list.append(((x, y), rect))
             self.fire_source_dict[pos]['rect'] = rect
 
+
     # ------- DRAWING ------- #
-    def draw_heat_zones(self):
+    def draw_heat_zones(self, pos=False):
         """Draw all the heat zone rectangles."""
-        for _, rect in self.fire_source_rect_list:
-            pygame.draw.rect(self.screen, (0, 0, 0), rect, 10)  # Example: Draw in red color
+
+        for rect_pos, rect in self.fire_source_rect_list:
+            if rect_pos == pos:
+                pygame.draw.rect(self.screen, 'limegreen', rect, 10, 4)
+            else:
+                # FIXME: must kast tekib isegi nendele, kus peaks roheline olema???
+                pass  # pygame.draw.rect(self.screen, 'black', rect, 10, 4)
 
 
-    def draw_progress_bar(self, rect, progress, max_progress):
+
+    def draw_progress_bar(self, rect, position, progress, max_progress):
         progress_percent = min(max(progress / max_progress, 0), 1)
-
         # Position to draw progress bar
         bar_width, bar_height = self.progress_bar_background.get_size()
         bar_x = rect.centerx - bar_width // 2
@@ -262,9 +269,13 @@ class HeatZone:
             visible_y = bar_y + bar_height - visible_height
             self.screen.blit(visible_part, (bar_x, visible_y))
 
+        if progress_percent * 100 == 100:
+            self.draw_heat_zones(pos=position)
+
 
     def draw_all_progress_bars(self, get_terrain_in_view):
         """Draw progress bars for all fire sources."""
+
         for fire_source in self.fire_source_dict.values():
             position = fire_source['position']
 
@@ -273,12 +284,19 @@ class HeatZone:
                 count = fire_source['count']
                 stage = fire_source['stage']
                 max_count = self.heat_zone_stages[stage]
+                
+                if count != 0:
+                    count = fire_source['count']
+                
+                try: # try error catch sest 'Wood' ei pruugi inventoris olemas olla
+                    count += self.player.inv['Wood']  # player count, liidab countile, mis positionil on
+                    if count == 0: count = fire_source['count']
+                except Exception: pass
 
                 if stage is "Blast Furnace":
                     continue
 
-                # Draw the layered progress bar
-                self.draw_progress_bar(rect, count, max_count)
+                self.draw_progress_bar(rect, position, count, max_count)
 
 
     def update(self):

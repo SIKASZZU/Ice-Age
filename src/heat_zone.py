@@ -10,6 +10,7 @@ class HeatZone:
         self.images = images
 
         self.fire_source_dict = {}
+        self.position_upgradable = []
 
         # self.fire_source_dict = {
         # position: {
@@ -180,7 +181,6 @@ class HeatZone:
             # Get all the stages in order
             stages = list(self.heat_zone_stages.keys())
 
-
             # Find the index of the current stage
             current_index = stages.index(current_stage)
 
@@ -193,6 +193,9 @@ class HeatZone:
                 self.fire_source_dict[pos]['count'] -= self.heat_zone_stages[current_stage]
 
                 self.map.data[pos] = self.heat_zones_id_dict[next_stage]
+        
+        if pos in self.position_upgradable: 
+            self.position_upgradable.remove(pos)
 
 
     def create_new_heat_source(self, mouse_pos, tree_rect_dict):
@@ -234,16 +237,15 @@ class HeatZone:
 
 
     # ------- DRAWING ------- #
-    def draw_heat_zones(self, pos=False):
+    def draw_heat_zones(self):
         """Draw all the heat zone rectangles."""
 
         for rect_pos, rect in self.fire_source_rect_list:
-            if rect_pos == pos:
+            if rect_pos in self.position_upgradable:
                 pygame.draw.rect(self.screen, 'limegreen', rect, 10, 4)
+            
             else:
-                # FIXME: must kast tekib isegi nendele, kus peaks roheline olema???
-                pass  # pygame.draw.rect(self.screen, 'black', rect, 10, 4)
-
+                pygame.draw.rect(self.screen, 'black', rect, 10, 4)
 
 
     def draw_progress_bar(self, rect, position, progress, max_progress):
@@ -269,8 +271,18 @@ class HeatZone:
             visible_y = bar_y + bar_height - visible_height
             self.screen.blit(visible_part, (bar_x, visible_y))
 
-        if progress_percent * 100 == 100:
-            self.draw_heat_zones(pos=position)
+        if progress_percent * 100 == 100 and position not in self.position_upgradable:
+            self.position_upgradable.append(position)
+
+        if position in self.position_upgradable and progress_percent * 100 != 100:
+            self.position_upgradable.remove(position)
+
+        # if progress_percent * 100 == 100:
+        #     if position not in self.position_upgradable:
+        #         self.position_upgradable.append(position)
+
+        # if position in self.position_upgradable and progress_percent * 100 != 100:
+        #     self.position_upgradable.remove(position)
 
 
     def draw_all_progress_bars(self, get_terrain_in_view):
@@ -299,8 +311,10 @@ class HeatZone:
                 self.draw_progress_bar(rect, position, count, max_count)
 
 
-    def update(self):
+    def update(self, terrain_in_view):
         self.update_heat_zone()
         self.create_heat_zone_rect_list()
-        # self.draw_heat_zones()
+        self.draw_all_progress_bars(terrain_in_view)
+        self.draw_heat_zones()
+
 

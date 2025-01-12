@@ -63,8 +63,7 @@ class Game:
 
         self.player.update()  # Alati enne renderer'i
 
-        self.heat_zone.update()
-        self.heat_zone.draw_all_progress_bars(terrain_in_view)
+        self.heat_zone.update(terrain_in_view)
 
         self.weather.update()
 

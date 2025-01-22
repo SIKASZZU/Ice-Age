@@ -2,37 +2,39 @@ import pygame
 from network import Network
 from test_player import Player
 
-# Pane server tööle ja ss kui server töötab pane client tööle
-
 width = 860
 height = 480
 win = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Client")
 
 
-def redrawWindow(win,player, player2):
-    win.fill((255,255,255))
-    player.draw(win)
-    player2.draw(win)
+def redrawWindow(win, players, player_id):
+    win.fill((255, 255, 255))
+    for idx, player in enumerate(players):
+        # Set the controlled player's color to green, others to red
+        player.color = (0, 255, 0) if idx == player_id else (255, 0, 0)
+        player.draw(win)
     pygame.display.update()
 
 
 def main():
     run = True
     n = Network()
-    p = n.getP()
+    player_id = n.player_id  # Get assigned player ID
+    players = n.get_players()
     clock = pygame.time.Clock()
 
     while run:
         clock.tick(60)
-        p2 = n.send(p)
+        players = n.send(players[player_id])  # Update this client's player data
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
 
-        p.move()
-        redrawWindow(win, p, p2)
+        players[player_id].move()
+        redrawWindow(win, players, player_id)
+
 
 main()

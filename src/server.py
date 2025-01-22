@@ -6,6 +6,8 @@ import pickle
 server = "localhost"
 port = 5555
 
+max_connected_players = 2
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
@@ -13,7 +15,7 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen(2)
+s.listen(max_connected_players)
 print("Waiting for a connection, Server Started")
 
 

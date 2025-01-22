@@ -1,21 +1,21 @@
 import socket
 from _thread import *
-from test_player import Player
+from player import Player
 import pickle
 
-server = "localhost"
-port = 27015  # default 27015
-
-max_connected_players = 2
+server = "0.0.0.0"
+port = 27015  # Default 27015
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((server, port))
+
 
 try:
     s.bind((server, port))
 except socket.error as e:
     str(e)
 
-s.listen(max_connected_players)
+s.listen(2)
 print("Waiting for a connection, Server Started")
 
 

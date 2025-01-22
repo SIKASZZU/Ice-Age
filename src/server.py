@@ -4,7 +4,7 @@ from player import Player
 import pickle
 
 server = "localhost"
-port = 5555
+port = 27015  # default 27015
 
 max_connected_players = 2
 

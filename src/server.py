@@ -1,6 +1,6 @@
 import socket
 from _thread import *
-from player import Player
+from test_player import Player
 import pickle
 
 server = "localhost"

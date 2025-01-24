@@ -78,28 +78,29 @@ class Tree:
 
             # TODO: lisada puude lohkumisele cooldown, animatsioon puudele
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE]:
-                try:
+            if not keys[pygame.K_SPACE]:
+                continue
+            
+            try:
+                # Lisab saadud itemid invi
+                resources_collected = {
+                    resource: random.randint(value_range[0], value_range[1])
+                    for resource, value_range in self.resource_value.items()
+                }
 
-                    # Lisab saadud itemid invi
-                    resources_collected = {
-                        resource: random.randint(value_range[0], value_range[1])
-                        for resource, value_range in self.resource_value.items()
-                    }
+                # Add each resource to the player's inventory
+                for resource, amount in resources_collected.items():
+                    self.player.add_items(item_name=resource, amount=amount)
 
-                    # Add each resource to the player's inventory
-                    for resource, amount in resources_collected.items():
-                        self.player.add_items(item_name=resource, amount=amount)
+                self.total_trees_harvested += 1
 
-                    self.total_trees_harvested += 1
-
-                    # removib listidest
-                    self.random_tree_positions.pop(position)
-                    self.rects.pop(position)
-                    self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
-                except Exception as e: 
-                    print('Tree removing error @ Tree.gather()', e)
-                break  # kui ei breaki, siis error, et self.rects dict changed sizes during iteration.
+                # removib listidest
+                self.random_tree_positions.pop(position)
+                self.rects.pop(position)
+                self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
+            except Exception as e: 
+                print('Tree removing error @ Tree.gather()', e)
+            break  # kui ei breaki, siis error, et self.rects dict changed sizes during iteration.
 
     def spawn(self):
         pass
@@ -118,16 +119,17 @@ class Tree:
             # need vaartused tunduvad vb lambised, aga need on mul tapselt vaadatud maitse jargi.
             # kui tree rect tundub perses ss x,y width ja height on su parimad sobrad
             x = round(coord[0] + half_width, 2)
-            y = round(coord[1], 2)
+            y = round(coord[1] - half_height // 1.8, 2)
 
             width = round(self.width - half_width * 2, 2)
             height = round(self.height - half_height // 1.5, 2)
 
-            # Rect listi tegemine
+            # Visuaalsete (window coordinaatide pohine) rectide listi tegemine
             x_for_rect = round(coord[0] - self.camera.offset.x + half_width, 2)
             y_for_rect = round(coord[1] - self.camera.offset.y - half_height // 1.8, 2)
             self.tree_rect_dict[position] = pygame.Rect(x_for_rect, y_for_rect, width, height)
 
+            # Coordinaatide pohine rectide list
             tree_rect = (x, y, width, height)
             if position not in self.rects:
                 self.rects[position] = tree_rect
@@ -136,6 +138,8 @@ class Tree:
         for pos in self.tree_rect_dict:
             pygame.draw.rect(self.screen, 'red', self.tree_rect_dict[pos], 2)
 
+        for pos in self.rects:
+            pygame.draw.rect(self.screen, 'yellow', self.rects[pos], 4)
         return
 
 

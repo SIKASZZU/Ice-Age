@@ -39,7 +39,7 @@ class Game:
 
         self.terrain_in_view = self.renderer.get_terrain_in_view()
 
-        self.tree_rect_dict = self.tree.calculate_rects()
+        self.rects_window_coord = self.tree.calculate_rects()
 
 
         self.required_wood = self.heat_zone.new_heat_source_cost
@@ -55,11 +55,11 @@ class Game:
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
         self.renderer.update()
 
-        self.tree_rect_dict, self.random_tree_positions = self.tree.update()
+        self.rects_window_coord, self.tree_position_coord = self.tree.update()
 
         # During hover, show the cost
-        if self.tree_rect_dict:
-            self.heat_zone.display_new_heat_source_cost(mouse_pos, self.tree_rect_dict, self.random_tree_positions, self.required_wood)
+        if self.rects_window_coord:
+            self.heat_zone.display_new_heat_source_cost(mouse_pos, self.rects_window_coord, self.tree_position_coord, self.required_wood)
 
         self.player.update()  # Alati enne renderer'i
 
@@ -84,7 +84,7 @@ class Game:
                         self.heat_zone.feed_heat_source(mouse_pos)
                         if 'Wood' in self.player.inv:
                             if self.player.inv['Wood'] >= self.required_wood:
-                                tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.tree_rect_dict)
+                                tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
                                 self.tree.gather(tree_pos, self.required_wood)
 
             self.render(mouse_pos)

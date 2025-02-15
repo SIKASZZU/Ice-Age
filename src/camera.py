@@ -17,6 +17,7 @@ class Camera:
         h = self.display_surface.get_size()[1] - (self.borders['top'] + self.borders['bottom'])
         self.rect = pygame.Rect(l, t, w, h)
 
+
     def center_target_camera(self, target):
         self.offset.x = target.centerx - self.half_w
         self.offset.y = target.centery - self.half_h

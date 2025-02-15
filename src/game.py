@@ -80,6 +80,7 @@ class Game:
         while self.running:
             self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2
             mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
+            current_fps = self.clock.get_fps()
 
             # Handle events
             for event in pygame.event.get():
@@ -93,18 +94,18 @@ class Game:
                     else:
                         self.heat_zone.feed_heat_source(mouse_pos)
 
-            # **Tick-based game logic (fixed updates)**
+            # tickratei lisamine
             current_time = pygame.time.get_ticks()
             if current_time - self.last_tick >= self.tick_interval:
-                self.logic()  # Runs at TICK_RATE
-                # **Render & FPS tracking**
+                
+                # RUNS AT TICKRATE SPEED
+                self.logic()
                 self.render(mouse_pos)
                 self.last_tick = current_time
 
-                #print(f"FPS: {current_fps:.2f} | Tick Rate: {self.TICK_RATE}")
+                # print(f"FPS: {current_fps:.2f} | Tick Rate: {self.TICK_RATE}")
 
 
-            current_fps = self.clock.get_fps()
             self.framerate.update(current_fps)
             fps_text = self.framerate.display_fps_statistics()
 

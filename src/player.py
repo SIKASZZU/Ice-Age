@@ -1,7 +1,6 @@
 import pygame
 from sprite import Sprite
 
-
 class Player:
     def __init__(self, screen, camera, map, font, images):
         self.screen = screen
@@ -29,17 +28,18 @@ class Player:
 
         self.current_animation = "idle_down"
         self.animation_speed = 5
+        self.sprite_frame_size = 130
         
         self.animations = {
-            "idle_left": Sprite("res/images/Idle_Left.png", 130, 130, 4, self.animation_speed),
-            "idle_right": Sprite("res/images/Idle_Right.png", 130, 130, 4, self.animation_speed),
-            "idle_up": Sprite("res/images/Idle_Up.png", 130, 130, 4, self.animation_speed),
-            "idle_down": Sprite("res/images/Idle_Down.png", 130, 130, 4, self.animation_speed),
+            "idle_left": Sprite("res/images/Idle_Left.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "idle_right": Sprite("res/images/Idle_Right.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "idle_up": Sprite("res/images/Idle_Up.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "idle_down": Sprite("res/images/Idle_Down.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
 
-            "move_left": Sprite("res/images/Left.png", 130, 130, 4, self.animation_speed),
-            "move_right": Sprite("res/images/Right.png", 130, 130, 4, self.animation_speed),
-            "move_up": Sprite("res/images/Up.png", 130, 130, 4, self.animation_speed),
-            "move_down": Sprite("res/images/Down.png", 130, 130, 4, self.animation_speed),
+            "move_left": Sprite("res/images/Left.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "move_right": Sprite("res/images/Right.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "move_up": Sprite("res/images/Up.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+            "move_down": Sprite("res/images/Down.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
         }
 
 
@@ -102,6 +102,7 @@ class Player:
 
         # print(f'Collected {amount, item_name}. INV:{self.inv}')
 
+
     def remove_items(self, item_name, amount=-1):
         """ Remove items by name to player's inventory """
         if item_name in self.inv:
@@ -111,7 +112,6 @@ class Player:
         else:
             print(f'{item_name} not in INV:{self.inv}')
             return False
-
 
 
     def inventory_display(self):
@@ -137,14 +137,19 @@ class Player:
         self.screen.blit(text_surface, text_rect)
 
 
-
     def update(self):
         self.movement()
         self.animations[self.current_animation].update()
 
-        animation_x = self.x - self.camera.offset.x
-        animation_y = self.y - self.camera.offset.y
-        self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
+        ### Animatsion, player Spritei keskele viimine ###
+        sprite_image_x = self.sprite_frame_size // 2
+        sprite_image_y = self.sprite_frame_size // 2
 
+        # sprite_image_x,y on sprite keskkoha viimine ruudu vasakusse nurka. 
+        # (self.rect[2] // 2) on spritei viimine ruudu keskkohta.
+        animation_x = self.x - self.camera.offset.x - sprite_image_x + (self.rect[2] // 2)
+        animation_y = self.y - self.camera.offset.y - sprite_image_y + (self.rect[3] // 2)
+        
+        self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
 
         self.inventory_display()

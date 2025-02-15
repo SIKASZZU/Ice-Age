@@ -20,7 +20,7 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((1920 // 1.5, 1080 // 1.5))  # Set up the game window
         self.clock = pygame.time.Clock()
-        self.running = True
+        self.running = True 
         self.font = pygame.font.Font(None, 50)
 
         # Initialize game components

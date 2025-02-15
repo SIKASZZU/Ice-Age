@@ -11,8 +11,8 @@ class Tree:
         self.player = player
         self.heat_zone = heat_zone
 
-        self.width = self.map.tile_size * 1
-        self.height = self.map.tile_size * 1.5
+        self.width = self.map.tile_size * 1.75
+        self.height = self.map.tile_size * 2.5
 
         self.total_trees_harvested = 0
         self.resource_stages = {

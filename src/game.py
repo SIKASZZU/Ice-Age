@@ -36,6 +36,11 @@ class Game:
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
 
+        # Tickrate
+        self.TICK_RATE = 48  # Set your desired tick rate (logic updates per second)
+        self.tick_interval = 1000 // self.TICK_RATE  # Time per tick in milliseconds
+        self.last_tick = pygame.time.get_ticks()
+
 
         self.terrain_in_view = self.renderer.get_terrain_in_view()
 
@@ -76,30 +81,35 @@ class Game:
             self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2
             mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
+            # Handle events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:  # Left mouse button
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    if self.player.inv.get('Wood', 0) >= self.required_wood:  
+                        tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
+                        if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
+                            self.tree.gather(tree_pos, self.required_wood)
+                    else:
                         self.heat_zone.feed_heat_source(mouse_pos)
-                        if 'Wood' in self.player.inv:
-                            if self.player.inv['Wood'] >= self.required_wood:
-                                tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
-                                self.tree.gather(tree_pos, self.required_wood)
 
-            self.render(mouse_pos)
-            self.logic()
+            # **Tick-based game logic (fixed updates)**
+            current_time = pygame.time.get_ticks()
+            if current_time - self.last_tick >= self.tick_interval:
+                self.logic()  # Runs at TICK_RATE
+                # **Render & FPS tracking**
+                self.render(mouse_pos)
+                self.last_tick = current_time
 
-            # Update FPS list
+                #print(f"FPS: {current_fps:.2f} | Tick Rate: {self.TICK_RATE}")
+
+
             current_fps = self.clock.get_fps()
             self.framerate.update(current_fps)
-
-            # Display FPS statistics
-
             fps_text = self.framerate.display_fps_statistics()
 
-            self.clock.tick(5000)  # Limit the game to 60 FPS
-            pygame.display.set_caption(f"Ice Age - {fps_text}")
+            self.clock.tick(1000)  # Cap FPS at 60
+            pygame.display.set_caption(f"Ice Age - {fps_text} | Tick Rate: {self.TICK_RATE}")
 
         pygame.quit()
 

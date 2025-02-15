@@ -78,7 +78,7 @@ class Game:
         """Main game loop."""
 
         while self.running:
-            self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2
+            self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2  # mdv xD
             mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
             current_fps = self.clock.get_fps()
 
@@ -87,12 +87,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    
+                    # Feedi heat_zonei
+                    self.heat_zone.feed_heat_source(mouse_pos)
+
+                    # Asenda puu heat_zoneiga
                     if self.player.inv.get('Wood', 0) >= self.required_wood:  
                         tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
                         if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
                             self.tree.gather(tree_pos, self.required_wood)
-                    else:
-                        self.heat_zone.feed_heat_source(mouse_pos)
 
             # tickratei lisamine
             current_time = pygame.time.get_ticks()

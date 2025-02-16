@@ -15,6 +15,18 @@ class Map:
         # Initialize data with procedural noise
         self.data = self.generate_data(width=self.width, height=self.height, seed=random.randint(1, 500))
 
+        self.cold_area = [0, 1, 10]
+
+        # FIXME: see on siin, et kasutada Playeri all heatzone id dicti. See voiks siit ara kaduda voi voikski siia jaada
+        self.heat_zones_id_dict: dict = {
+            'Torch': 20,
+            'Firepit': 25,
+            'Campfire': 30,
+            'Bonfire': 35,
+            'Furnace': 40,
+            'Blast Furnace': 45,
+        }
+
     @staticmethod
     def generate_data(width, height, scale=50.0, octaves=6, persistence=0.5, lacunarity=2.0, seed=42):
         data = np.zeros((height, width), dtype=int)

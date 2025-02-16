@@ -112,25 +112,23 @@ class Tree:
 
         # draw rect kaib windowi jargi.
         for position, coord in self.tree_position_coord.items():
-            
             # need vaartused tunduvad vb lambised, aga need on mul tapselt vaadatud maitse jargi.
             # kui tree rect tundub perses ss x,y width ja height on su parimad sobrad
-            half_width, half_height = self.width // 5, self.height // 2
+            width = round(self.width - (self.width // 1.4) // 1.5, 2)
+            height = round(self.height - (self.height // 2) // 1.5, 2)
 
-            width = round(self.width - half_width * 2, 2)
-            height = round(self.height - half_height // 1.5, 2)
+            #### Visuaalsete (window coordinaatide pohine) rectide listi tegemine ####
+            x_for_rect = round(coord[0] - self.camera.offset.x, 2)
+            y_for_rect = round((coord[1] - self.camera.offset.y) - self.height + self.map.tile_size * 2, 2)
+            self.rects_window_coord[position] = pygame.Rect(
+                x_for_rect, y_for_rect, width, height)
 
-            # Visuaalsete (window coordinaatide pohine) rectide listi tegemine
-            x_for_rect = round(coord[0] - self.camera.offset.x + half_width, 2)
-            y_for_rect = round(coord[1] - self.camera.offset.y - half_height // 1.8, 2)
-            self.rects_window_coord[position] = pygame.Rect(x_for_rect, y_for_rect, width, height)
-
-            # Coordinaatide pohine rectide list
+            #### Coordinaatide pohine rectide list // SELLE JARGI TOIMUB KA PICK UPPIMINE ####
             if position in self.rects_map_coord:
                 continue
 
-            x = round(coord[0] + half_width, 2)
-            y = round(coord[1] - half_height // 1.8, 2)
+            x = round(coord[0], 2)
+            y = round(coord[1] - self.height + self.map.tile_size * 2, 2)
             tree_rect = (x, y, width, height)
             self.rects_map_coord[position] = tree_rect
 

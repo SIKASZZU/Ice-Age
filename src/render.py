@@ -177,7 +177,7 @@ class Render:
                 # Base position without random offset
                 position = (row_idx * self.map.tile_size, col_idx * self.map.tile_size)
 
-                # Random offset
+                    # Random offset
                 if random.random() > 0.5:
                     position = (
                         position[0] + random.uniform(self.map.tile_size * 0.01, self.map.tile_size * 0.2),
@@ -193,9 +193,11 @@ class Render:
                 # Store tree position in the map (to avoid duplicating)
                 self.tree.tree_position_coord[position_by_grid] = (round(position[0], 2), round(position[1], 2))
 
+            # self.tree.width, self.tree.height
+
             # Append tree image and position
             tree_position = (
-            position[0] - self.camera.offset.x, position[1] - self.camera.offset.y - self.tree.height // 2)
+            position[0] - self.camera.offset.x - (self.tree.width // 4), position[1] - self.camera.offset.y - (self.tree.height // 2))  #
 
             self.tree_images.append((self.tree.image, tree_position))
 

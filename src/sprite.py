@@ -3,7 +3,7 @@ import os
 
 
 class Sprite:
-    def __init__(self, image_path, frame_width, frame_height, num_frames, animation_speed):
+    def __init__(self, image_path, frame_width, frame_height, num_frames, animation_speed, scale_factor=0.5):
         """
         Initialize the sprite.
 
@@ -12,6 +12,7 @@ class Sprite:
         :param frame_height: Height of each frame in the sprite sheet.
         :param num_frames: Total number of frames in the sprite sheet.
         :param animation_speed: Animation speed (frames per second).
+        :param scale_factor: Factor by which to scale the frames (default is 1, meaning 130px).
         """
 
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Move up to project root
@@ -22,20 +23,29 @@ class Sprite:
         self.frame_height = frame_height
         self.num_frames = num_frames
         self.animation_speed = animation_speed
+        self.scale_factor = scale_factor
 
+        # Extract and resize frames
         self.frames = [
-            self.image.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
+            pygame.transform.scale(
+                self.image.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height)),
+                (int(frame_width * scale_factor), int(frame_height * scale_factor))
+            )
             for i in range(num_frames)
         ]
 
         self.current_frame = 0
         self.last_update = pygame.time.get_ticks()
 
-    def update(self):  # Updateb animationi
+
+    def update(self):
+        """Update animation frame based on time."""
+
         now = pygame.time.get_ticks()
         if now - self.last_update > 1000 / self.animation_speed:
             self.last_update = now
             self.current_frame = (self.current_frame + 1) % self.num_frames
+
 
     def draw(self, surface, x, y):
         """

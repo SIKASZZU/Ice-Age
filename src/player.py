@@ -25,21 +25,22 @@ class Player:
 
         # Animation
         self.last_input = "s"
+        self.scale_factor = 100/130  # kui suur on player. 130px on max (sprite ise on 520x130 ehk 4 pilti 130x130)
 
         self.current_animation = "idle_down"
         self.animation_speed = 5
-        self.sprite_frame_size = 130
-        
-        self.animations = {
-            "idle_left": Sprite("res/images/Idle_Left.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "idle_right": Sprite("res/images/Idle_Right.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "idle_up": Sprite("res/images/Idle_Up.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "idle_down": Sprite("res/images/Idle_Down.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+        self.frame_size = 130
 
-            "move_left": Sprite("res/images/Left.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "move_right": Sprite("res/images/Right.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "move_up": Sprite("res/images/Up.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
-            "move_down": Sprite("res/images/Down.png", self.sprite_frame_size, self.sprite_frame_size, 4, self.animation_speed),
+        self.animations = {
+            "idle_left": Sprite("res/images/Idle_Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_right": Sprite("res/images/Idle_Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_up": Sprite("res/images/Idle_Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_down": Sprite("res/images/Idle_Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+
+            "move_left": Sprite("res/images/Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_right": Sprite("res/images/Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_up": Sprite("res/images/Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_down": Sprite("res/images/Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
         }
 
         # Cold
@@ -182,13 +183,12 @@ class Player:
         self.animations[self.current_animation].update()
 
         ### Animatsion, player Spritei keskele viimine ###
-        sprite_image_x = self.sprite_frame_size // 2
-        sprite_image_y = self.sprite_frame_size // 2
+        sprite_size = self.frame_size * self.scale_factor
 
-        # sprite_image_x,y on sprite keskkoha viimine ruudu vasakusse nurka. 
-        # (self.rect[2] // 2) on spritei viimine ruudu keskkohta.
-        animation_x = self.x - self.camera.offset.x - sprite_image_x + (self.rect[2] // 2)
-        animation_y = self.y - self.camera.offset.y - sprite_image_y + (self.rect[3] // 2)
+        # sprite_size on sprite keskkoha viimine ruudu vasakusse nurka. 
+        # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
+        animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
+        animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
         
         self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
 

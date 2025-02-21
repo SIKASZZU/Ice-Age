@@ -1,0 +1,32 @@
+> puude kohal olev count vaja ymber paigutada
+> green trees for when tile under tree is heatzone.
+> heat zonei feedimine, et see ei hakkaks ara kustuma
+> right clickiga feedid tuld, left clickiga upgradeid stagei.
+> render after, before ara teha. Also rectidele teha
+> optimize blitting, drawing!!!!!!
+> fire on visuaalselt vaiksem kui seal on vahem puid
+> fire visuaalselt kustub ara kui puid ei ole
+> lisada 
+
+Golem
+def init>
+	HP
+	x y
+	attack speed
+	attack dmg
+	animation - image
+	
+def move>
+	naq goblinid sons of the forestis ai pask
+	kui peksad ss muutuvad agressiivemaks 
+	
+	MAIN -> focusivad heat source 
+
+def hp> 
+	if in heat zone deal dmg
+	if player attacks deal dmg
+	
+
+def put_the_flame_out>
+	kustutab heat source kui on selle l2hedad
+	

@@ -88,7 +88,7 @@ class Game:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                     # Feedi heat_zonei
-                    self.heat_zone.feed_heat_source(mouse_pos, 'left_click')
+                    self.heat_zone.fuel_heat_source(mouse_pos, 'left_click')
 
                     # Asenda puu heat_zoneiga
                     if self.player.inv.get('Wood', 0) >= self.required_wood:  

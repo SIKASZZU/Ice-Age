@@ -10,6 +10,9 @@
 	> esimestel mangu sekunditel seletab ara parema, vasaku kliki funktsioonid (vasak upgrade, parem feed)
 	> movement keys.
 
+> HUDi ei lisa
+	> elud on seotud kylma indikaatoriga. Mida kylmem playeril on, seda aeglasemini ta liigub, kuniks surnuks kylmub yhe koha peale.
+
 
 Golem
 def init>

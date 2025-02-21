@@ -5,6 +5,7 @@ from weather import Weather
 from map import Map
 from tree import Tree
 from camera import Camera
+from items import Items
 from player import Player
 from render import Render
 from images import Images
@@ -24,15 +25,16 @@ class Game:
         self.font = pygame.font.Font(None, 50)
 
         # Initialize game components
+        self.items = Items()
         self.camera = Camera()
         self.map = Map(self.screen, self.camera)
         self.images = Images()
-        self.player = Player(self.screen, self.camera, self.map, self.font, self.images)
+        self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
         self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone, self.items)
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
 

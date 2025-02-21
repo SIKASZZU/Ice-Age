@@ -1,9 +1,8 @@
 import pygame
 import random
 
-
 class Render:
-    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set, heat_zone):
+    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set, heat_zone, items):
         self.screen = screen
         self.camera = camera
         self.map = map
@@ -13,6 +12,7 @@ class Render:
         self.images = images
         self.tile_set = tile_set
         self.heat_zone = heat_zone
+        self.items = items
 
         ground_path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', ground_path)
@@ -146,7 +146,7 @@ class Render:
                         ground_image = self.ground_image
 
                 # TODO: Ground + Melted + Water -> Tilesetti vaja
-                if terrain_value in [100, 110, 20, 25, 30, 35, 40, 45]:
+                if terrain_value in self.items.heated_area:
                     surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
                     ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
                     if not ground_image:

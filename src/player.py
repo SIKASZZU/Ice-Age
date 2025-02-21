@@ -2,12 +2,13 @@ import pygame
 from sprite import Sprite
 
 class Player:
-    def __init__(self, screen, camera, map, font, images):
+    def __init__(self, screen, camera, map, font, images, items):
         self.screen = screen
         self.camera = camera
         self.map = map
         self.font = font
         self.images = images
+        self.items = items
 
         player_pos_grid = self.map.get_terrain_value_positions(20)  # 20 -> Torch ID
 
@@ -153,7 +154,7 @@ class Player:
         current_time = pygame.time.get_ticks()  # time for tracking the last damage,heal
 
         # DAMAGE in cold zones (map.py) every 2 sec 1/10 of max health
-        if terrain_value in self.map.cold_area:
+        if terrain_value in self.items.cold_area:
             if self.last_time_damaged == None: self.last_time_damaged = current_time
 
             if current_time > self.last_time_damaged + 2000:  # every 2 sec damage by cold
@@ -161,7 +162,7 @@ class Player:
                 if self.cold_tolerance > 0:  self.cold_tolerance -= self.damage_by_cold
 
         # HEALING in heat_zone every 4 sec heal 1/10 of max health
-        if terrain_value in self.map.heat_zones_id_dict.values():
+        if terrain_value in self.items.heated_area and self.:
             if self.last_time_healed == None: self.last_time_healed = current_time
 
             if current_time > self.last_time_healed + 4000:  # every 4 sec heal by heat_zone
@@ -173,8 +174,8 @@ class Player:
         elif 3 < self.cold_tolerance <= 7:  self.cold_status = 'MILD'
         elif self.cold_tolerance <= 3:  self.cold_status = 'EXTREME'
 
-        # print(self.cold_tolerance, 'self.cold_tolerance')
-        # print(self.cold_status, 'self.cold_status')
+        print(self.cold_tolerance, 'self.cold_tolerance')
+        print(self.cold_status, 'self.cold_status')
 
     def update(self):
 

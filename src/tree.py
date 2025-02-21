@@ -90,7 +90,7 @@ class Tree:
 
                 # Add each resource to the player's inventory
                 for resource, amount in resources_collected.items():
-                    self.player.add_items(item_name=resource, amount=amount)
+                    self.player.add_items(item_name=resource, amount=amount+100)
 
                 self.total_trees_harvested += 1
 

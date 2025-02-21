@@ -87,15 +87,17 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-                    
                     # Feedi heat_zonei
-                    self.heat_zone.feed_heat_source(mouse_pos)
+                    self.heat_zone.feed_heat_source(mouse_pos, 'left_click')
 
                     # Asenda puu heat_zoneiga
                     if self.player.inv.get('Wood', 0) >= self.required_wood:  
                         tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
                         if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
                             self.tree.gather(tree_pos, self.required_wood)
+
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
+                    self.heat_zone.fuel_heat_source(mouse_pos, 'right_click')
 
             # tickratei lisamine
             current_time = pygame.time.get_ticks()

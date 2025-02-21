@@ -6,7 +6,10 @@
 > optimize blitting, drawing!!!!!!
 > fire on visuaalselt vaiksem kui seal on vahem puid
 > fire visuaalselt kustub ara kui puid ei ole
-> lisada 
+> lisada instructionid ekraanile Panna ntks mingi mouse pilt, highlighida klikid ning korvale lisada tekst.
+	> esimestel mangu sekunditel seletab ara parema, vasaku kliki funktsioonid (vasak upgrade, parem feed)
+	> movement keys.
+
 
 Golem
 def init>

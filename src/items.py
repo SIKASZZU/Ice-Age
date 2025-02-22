@@ -19,4 +19,5 @@ class Items:
     def __init__(self):
             
         self.heated_area = [100, 110, 20, 25, 30, 35, 40, 45]
-        self.cold_area = [0, 1, 10]
+        self.cold_area = [0, 1, 10, 120, 125, 130, 135, 140, 145]
+        self.areas_combined = self.heated_area + self.cold_area

@@ -9,9 +9,12 @@
 > lisada instructionid ekraanile Panna ntks mingi mouse pilt, highlighida klikid ning korvale lisada tekst.
 	> esimestel mangu sekunditel seletab ara parema, vasaku kliki funktsioonid (vasak upgrade, parem feed)
 	> movement keys.
-
 > HUDi ei lisa
 	> elud on seotud kylma indikaatoriga. Mida kylmem playeril on, seda aeglasemini ta liigub, kuniks surnuks kylmub yhe koha peale.
+> K2ndude lisamine
+	> k2nde saab yles korjata nagu puidki ning annab 1 woodi playerile.
+> gathering timer nii tree'dele, kui ka siis k2ndudele
+> ground, mis on yles soojenenud ning ei muutu kohe tagasi snowyiks.?
 
 
 Golem

@@ -162,7 +162,7 @@ class Player:
                 if self.cold_tolerance > 0:  self.cold_tolerance -= self.damage_by_cold
 
         # HEALING in heat_zone every 4 sec heal 1/10 of max health
-        if terrain_value in self.items.heated_area and self.:
+        if terrain_value in self.items.heated_area:
             if self.last_time_healed == None: self.last_time_healed = current_time
 
             if current_time > self.last_time_healed + 4000:  # every 4 sec heal by heat_zone
@@ -174,8 +174,8 @@ class Player:
         elif 3 < self.cold_tolerance <= 7:  self.cold_status = 'MILD'
         elif self.cold_tolerance <= 3:  self.cold_status = 'EXTREME'
 
-        print(self.cold_tolerance, 'self.cold_tolerance')
-        print(self.cold_status, 'self.cold_status')
+        # print(self.cold_tolerance, 'self.cold_tolerance')
+        # print(self.cold_status, 'self.cold_status')
 
     def update(self):
 

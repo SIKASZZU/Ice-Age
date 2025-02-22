@@ -83,7 +83,7 @@ class HeatZone:
         self.fire_source_grid = self.all_fire_source_list[0][0], self.all_fire_source_list[0][1]
         self.fire_source = (self.fire_source_grid[0] * self.map.tile_size, self.fire_source_grid[1] * self.map.tile_size)
 
-        self.first_stage_dict = {
+        first_stage_dict = {
             'stage': "Torch",
             'count': 0,
             'position': self.fire_source_grid,
@@ -93,7 +93,7 @@ class HeatZone:
             'not_heating': False
         }
 
-        self.fire_source_dict[self.fire_source_grid] = self.first_stage_dict
+        self.fire_source_dict[self.fire_source_grid] = first_stage_dict
 
         # ---- Progressbar ---- #
         self.height = 50
@@ -249,7 +249,16 @@ class HeatZone:
         # Check for interaction with a tree to create a new fire source
         for tree_pos, tree_rect in tree_rect_dict.items():
             if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
-                self.fire_source_dict[tree_pos] = self.first_stage_dict
+                first_stage_dict = {
+                    'stage': "Torch",
+                    'count': 0,
+                    'position': tree_pos,
+                    'rect': pygame.Rect(
+                        tree_rect.x, tree_rect.y, self.map.tile_size, self.map.tile_size
+                    ),
+                }
+                
+                self.fire_source_dict[tree_pos] = first_stage_dict
 
                 # Remove the tree from the tree rect dictionary
                 del tree_rect_dict[tree_pos]
@@ -423,9 +432,9 @@ class HeatZone:
 
 
     def update(self, terrain_in_view):
-        self.update_heat_zone()
         self.create_heat_zone_rect_list()
-        self.calculate_heat_status()
+        self.calculate_heat_status(False)
+        self.update_heat_zone()
         self.draw_all_progress_bars(terrain_in_view)
         self.draw_heat_zones()
 

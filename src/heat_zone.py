@@ -41,6 +41,16 @@ class HeatZone:
             'Blast Furnace': 45,
         }
 
+        self.snowy_heat_zones_id_dict: dict = {
+            'Torch': 120,
+            'Firepit': 125,
+            'Campfire': 130,
+            'Bonfire': 135,
+            'Furnace': 140,
+            'Blast Furnace': 145,
+        }
+
+
         self.heat_zone_stages = {
             'Torch': 15,
             'Firepit': 30,
@@ -108,8 +118,8 @@ class HeatZone:
             radius = self.heat_zone_ranges[current_stage]
             minus = radius
             plus = radius + 1
-
             fire_x, fire_y = pos
+
             if self.fire_source_dict[pos]['not_heating'] == True:
                 # Heated grounds -> Snowy grounds
                 for x in range(fire_y - minus, fire_y + plus):
@@ -120,9 +130,9 @@ class HeatZone:
                                 self.map.data[y, x] = 1  # Ground near fire
                             elif terrain_value == 110:  # Trees
                                 self.map.data[y, x] = 10  # Trees near fire
-
-                            # TODO # campfire id, millel on lume taust
-
+                            elif terrain_value in self.heat_zones_id_dict.values():
+                                self.map.data[y, x] = int('1' + str(terrain_value))
+                                
             else:  # Heated grounds <- Snowy grounds
                 for x in range(fire_y - minus, fire_y + plus):
                     for y in range(fire_x - minus, fire_x + plus):
@@ -132,9 +142,8 @@ class HeatZone:
                                 self.map.data[y, x] = 100  # Ground near fire
                             elif terrain_value == 10:  # Trees
                                 self.map.data[y, x] = 110  # Trees near fire
-
-                            # TODO # campfire id, millel on lume taust
-
+                            elif terrain_value in self.snowy_heat_zones_id_dict.values():
+                                self.map.data[y, x] = int(str(terrain_value)[1:])
 
 
     def fuel_heat_source(self, mouse_pos, click):
@@ -147,7 +156,6 @@ class HeatZone:
                 elif click == 'right_click':
                     self.calculate_heat_status(True)
                     break
-
 
 
     def draw_heat_source_cost(self, tree_pos, required_wood):

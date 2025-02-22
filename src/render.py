@@ -135,11 +135,11 @@ class Render:
                 self.water_images.append((self.water_image, position))
 
             # terrain
-            elif terrain_value in [1, 10, 100, 110, 20, 25, 30, 35, 40, 45]:
+            elif terrain_value in self.items.areas_combined:
                 ground_image = None
                 position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
-                if terrain_value in [1, 10]:
+                if terrain_value in self.items.cold_area:
                     surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
                     ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
                     if not ground_image:
@@ -202,19 +202,19 @@ class Render:
             self.tree_images.append((self.tree.image, tree_position))
 
         # heat source
-        if terrain_value in [20, 25, 30, 35, 40, 45]:
+        if terrain_value in [20, 25, 30, 35, 40, 45, 120, 125, 130, 135, 140, 145]:
             image = None
-            if terrain_value == 20:
+            if terrain_value == 20 or terrain_value == 120:
                 image = self.torch_image
-            if terrain_value == 25:
+            if terrain_value == 25 or terrain_value == 125:
                 image = self.firepit_image
-            if terrain_value == 30:
+            if terrain_value == 30 or terrain_value == 130:
                 image = self.campfire_image
-            if terrain_value == 35:
+            if terrain_value == 35 or terrain_value == 135:
                 image = self.bonfire_image
-            if terrain_value == 40:
+            if terrain_value == 40 or terrain_value == 140:
                 image = self.furnace_image
-            if terrain_value == 45:
+            if terrain_value == 45 or terrain_value == 145:
                 image = self.blast_furnace_image
 
             position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)

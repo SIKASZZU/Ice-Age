@@ -83,7 +83,7 @@ class HeatZone:
         self.fire_source_grid = self.all_fire_source_list[0][0], self.all_fire_source_list[0][1]
         self.fire_source = (self.fire_source_grid[0] * self.map.tile_size, self.fire_source_grid[1] * self.map.tile_size)
 
-        first_stage_dict = {
+        self.first_stage_dict = {
             'stage': "Torch",
             'count': 0,
             'position': self.fire_source_grid,
@@ -93,7 +93,7 @@ class HeatZone:
             'not_heating': False
         }
 
-        self.fire_source_dict[self.fire_source_grid] = first_stage_dict
+        self.fire_source_dict[self.fire_source_grid] = self.first_stage_dict
 
         # ---- Progressbar ---- #
         self.height = 50
@@ -249,16 +249,7 @@ class HeatZone:
         # Check for interaction with a tree to create a new fire source
         for tree_pos, tree_rect in tree_rect_dict.items():
             if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
-                # Add a new fire source at the tree's position
-                new_fire_source = {
-                    'stage': 'Torch',
-                    'count': 0,
-                    'position': tree_pos,
-                    'rect': pygame.Rect(
-                        tree_rect.x, tree_rect.y, self.map.tile_size, self.map.tile_size
-                    )
-                }
-                self.fire_source_dict[tree_pos] = new_fire_source
+                self.fire_source_dict[tree_pos] = self.first_stage_dict
 
                 # Remove the tree from the tree rect dictionary
                 del tree_rect_dict[tree_pos]
@@ -403,11 +394,11 @@ class HeatZone:
                 
                 except Exception: pass
 
-            try: self.draw_heat_status(position, fire_source['current_wood_inside'], max_value_source)
+            try: self.draw_fuel_status(position, fire_source['current_wood_inside'], max_value_source)
             except KeyError as e: print('fix me @ heat_zone.py, def calculate heat status', e)
 
 
-    def draw_heat_status(self, position, progress, max_progress):
+    def draw_fuel_status(self, position, progress, max_progress):
         if progress == None or max_progress == None: 
             return  # prevent error
         

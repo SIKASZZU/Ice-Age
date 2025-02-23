@@ -10,26 +10,25 @@ class HeatZone:
         self.images = images
 
         self.fire_source_dict = {}
-        self.position_upgradable = []  # green recti joonistamiseks vajalik
+        self.position_upgradable = []
 
         # self.fire_source_dict = {
         # position: {
         # 'stage': "Torch",
         # 'count': 0,
         # 'position': self.fire_source_grid,
-        # 'rect': None,
-        # 'current_wood_inside': 0
+        # 'rect': None
         # }}
 
         self.fire_source_rect_list = []
 
-        self.heat_zone_ranges: dict = {
+        self.heat_zones_dict: dict = {
             'Torch': 0,           # ID 20
             'Firepit': 1,         # ID 25
-            'Campfire': 1,        # ID 30
-            'Bonfire': 2,         # ID 35
-            'Furnace': 3,         # ID 40
-            'Blast Furnace': 3,   # ID 45
+            'Campfire': 2,        # ID 30
+            'Bonfire': 3,         # ID 35
+            'Furnace': 4,         # ID 40
+            'Blast Furnace': 6,   # ID 45
         }
 
         self.heat_zones_id_dict: dict = {
@@ -41,16 +40,6 @@ class HeatZone:
             'Blast Furnace': 45,
         }
 
-        self.snowy_heat_zones_id_dict: dict = {
-            'Torch': 120,
-            'Firepit': 125,
-            'Campfire': 130,
-            'Bonfire': 135,
-            'Furnace': 140,
-            'Blast Furnace': 145,
-        }
-
-
         self.heat_zone_stages = {
             'Torch': 15,
             'Firepit': 30,
@@ -60,22 +49,9 @@ class HeatZone:
             'Blast Furnace': 480
         }
 
-        # Kui palju puitu saab fuelida igas stagei's (max vaartused)
-        self.heat_zone_thresholds = {
-            'Torch': 2,
-            'Firepit': 6,
-            'Campfire': 18,
-            'Bonfire': 30,
-            'Furnace': 60,
-            'Blast Furnace': 100
-        }
-        self.burn_wood_cooldown = 3000
-        self.last_burned = 0
-
         self.allow_new_heat_source_list = 'Blast Furnace', 'Furnace', 'Bonfire', 'Campfire', 'Firepit', 'Torch'
         self.radius = 0
-
-        self.new_heat_source = "Torch"  # pmst, muuda mind, kui sa tahad seda, seda heat sourci muuta. TODO, FIXME
+        self.new_heat_source = "Torch"
         self.new_heat_source_cost = 8  # Wood
 
         self.all_fire_source_list = self.map.get_terrain_value_positions(20)
@@ -87,10 +63,7 @@ class HeatZone:
             'stage': "Torch",
             'count': 0,
             'position': self.fire_source_grid,
-            'rect': None,
-            'current_wood_inside': None,
-            'current_heat_range': self.heat_zone_ranges[self.new_heat_source],
-            'not_heating': False
+            'rect': None
         }
 
         self.fire_source_dict[self.fire_source_grid] = first_stage_dict
@@ -114,48 +87,34 @@ class HeatZone:
 
     def update_heat_zone(self):
         for pos in self.fire_source_dict:
-            current_stage = self.fire_source_dict[pos]['stage']
-            radius = self.heat_zone_ranges[current_stage]
+            stage = self.fire_source_dict[pos]['stage']
+            radius = self.heat_zones_dict[stage]
+
             minus = radius
             plus = radius + 1
+
             fire_x, fire_y = pos
 
-            if self.fire_source_dict[pos]['not_heating'] == True:
-                # Heated grounds -> Snowy grounds
-                for x in range(fire_y - minus, fire_y + plus):
-                    for y in range(fire_x - minus, fire_x + plus):
-                        if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                            terrain_value = self.map.data[y, x]
-                            if terrain_value == 100:  # Ground
-                                self.map.data[y, x] = 1  # Ground near fire
-                            elif terrain_value == 110:  # Trees
-                                self.map.data[y, x] = 10  # Trees near fire
-                            elif terrain_value in self.heat_zones_id_dict.values():
-                                self.map.data[y, x] = int('1' + str(terrain_value))
-                                
-            else:  # Heated grounds <- Snowy grounds
-                for x in range(fire_y - minus, fire_y + plus):
-                    for y in range(fire_x - minus, fire_x + plus):
-                        if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                            terrain_value = self.map.data[y, x]
-                            if terrain_value == 1:  # Ground
-                                self.map.data[y, x] = 100  # Ground near fire
-                            elif terrain_value == 10:  # Trees
-                                self.map.data[y, x] = 110  # Trees near fire
-                            elif terrain_value in self.snowy_heat_zones_id_dict.values():
-                                self.map.data[y, x] = int(str(terrain_value)[1:])
+            # Iterate over the terrain grid around the fire source to update the tiles
+            for x in range(fire_y - minus, fire_y + plus):
+                for y in range(fire_x - minus, fire_x + plus):
+                    # Ensure we're within the bounds of the map
+                    if 0 <= x < self.map.width and 0 <= y < self.map.height:
+                        # Get the terrain value at the current tile position
+                        terrain_value = self.map.data[y, x]
+
+                        # Check if the terrain is Ground (1) or Trees (10) and update accordingly
+                        if terrain_value == 1:  # Ground
+                            self.map.data[y, x] = 100  # Ground near fire
+                        elif terrain_value == 10:  # Trees
+                            self.map.data[y, x] = 110  # Trees near fire
 
 
-    def fuel_heat_source(self, mouse_pos, click):
+    def feed_heat_source(self, mouse_pos):
         for pos, rect in self.fire_source_rect_list:
             if rect.collidepoint(mouse_pos):
-                if click == 'left_click':
-                    self.upgrade_fire_source_stage(pos)
-                    break
-
-                elif click == 'right_click':
-                    self.calculate_heat_status(True)
-                    break
+                self.upgrade_fire_source_stage(pos)
+                break
 
 
     def draw_heat_source_cost(self, tree_pos, required_wood):
@@ -200,13 +159,13 @@ class HeatZone:
         current_stage = self.fire_source_dict[pos]['stage']
         current_count = self.fire_source_dict[pos]['count']
 
-        if current_stage is list(self.heat_zone_ranges.keys())[-1]:  # Vaatab viimast fire source stage'i
+        if current_stage is list(self.heat_zones_dict.keys())[-1]:  # Vaatab viimast fire source stage'i
             return
 
         item = 'Wood'
 
         if item not in self.player.inv or self.player.inv[item] <= 0:
-            return  # No wood in inventory to fuel
+            return  # No wood in inventory to feed
 
         # Get the required amount to upgrade
         required_to_upgrade = self.heat_zone_stages[current_stage] - current_count
@@ -229,10 +188,10 @@ class HeatZone:
                 # Upgrade to the next stage
                 next_stage = stages[current_index + 1]
                 self.fire_source_dict[pos]['stage'] = next_stage
-                self.fire_source_dict[pos]['current_wood_inside'] = self.heat_zone_thresholds[current_stage]
 
                 # Remove the amount needed for this upgrade from the count
                 self.fire_source_dict[pos]['count'] -= self.heat_zone_stages[current_stage]
+
                 self.map.data[pos] = self.heat_zones_id_dict[next_stage]
         
         if pos in self.position_upgradable: 
@@ -249,16 +208,16 @@ class HeatZone:
         # Check for interaction with a tree to create a new fire source
         for tree_pos, tree_rect in tree_rect_dict.items():
             if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
-                first_stage_dict = {
-                    'stage': "Torch",
+                # Add a new fire source at the tree's position
+                new_fire_source = {
+                    'stage': 'Torch',
                     'count': 0,
                     'position': tree_pos,
                     'rect': pygame.Rect(
                         tree_rect.x, tree_rect.y, self.map.tile_size, self.map.tile_size
-                    ),
+                    )
                 }
-                
-                self.fire_source_dict[tree_pos] = first_stage_dict
+                self.fire_source_dict[tree_pos] = new_fire_source
 
                 # Remove the tree from the tree rect dictionary
                 del tree_rect_dict[tree_pos]
@@ -285,8 +244,8 @@ class HeatZone:
             if rect_pos in self.position_upgradable:
                 pygame.draw.rect(self.screen, 'limegreen', rect, 10, 4)
             
-            # else:
-            #     pygame.draw.rect(self.screen, 'black', rect, 10, 4)
+            else:
+                pygame.draw.rect(self.screen, 'black', rect, 10, 4)
 
 
     def draw_progress_bar(self, rect, position, progress, max_progress):
@@ -341,100 +300,20 @@ class HeatZone:
                 if count != 0:
                     count = fire_source['count']
                 
-                ### Vaatab, kui palju on playeril woodi ning lisab selle koheselt heat sourci progressi.
-                # try: # try error catch sest 'Wood' ei pruugi inventoris olemas olla
-                #     count += self.player.inv['Wood']  # player count, liidab countile, mis positionil on
-                #     if count == 0: count = fire_source['count']
-                # except Exception: pass
-                
-                if stage == "Blast Furnace":
+                try: # try error catch sest 'Wood' ei pruugi inventoris olemas olla
+                    count += self.player.inv['Wood']  # player count, liidab countile, mis positionil on
+                    if count == 0: count = fire_source['count']
+                except Exception: pass
+
+                if stage is "Blast Furnace":
                     continue
 
                 self.draw_progress_bar(rect, position, count, max_count)
 
 
-    def calculate_heat_status(self, clicked_on_heat_source = False):
-
-        # heat zone asukohtade leidmine
-        for fire_source in self.fire_source_dict.values():
-            position = fire_source['position']
-
-            # max fueling vaartuse leidmine
-            current_stage = fire_source['stage']
-            max_value_source = self.heat_zone_thresholds[current_stage]
-            
-            if clicked_on_heat_source == False:
-                ### Kalkuleeri puidu kulumine
-                # iga self.burn_wood_cooldown tagant votab yhe woodi ahjust ara, kuid ei vahenda stagei! Stage naitab palju ta mahutada suudab
-                current_time = pygame.time.get_ticks()
-                if current_time - self.last_burned >= self.burn_wood_cooldown:
-                    self.last_burned = current_time
-
-                    if fire_source['current_wood_inside'] is None:  
-                        fire_source['current_wood_inside'] = max_value_source - 1
-                        fire_source['not_heating'] = False
-
-                    elif fire_source['current_wood_inside'] > 0:  
-                        fire_source['current_wood_inside'] -= 10
-                        fire_source['not_heating'] = False
-                    
-                    if fire_source['current_wood_inside'] <= 1:
-                        fire_source['not_heating'] = True
-
-            elif clicked_on_heat_source == True:
-                ### fuel heat source
-
-                try:
-                    if max_value_source == fire_source['current_wood_inside']:
-                        print("ALREADY MAX BROUSKI")
-                        continue
-
-                    player_wood_amount = self.player.inv['Wood']
-                    if player_wood_amount < max_value_source:
-                        self.player.inv['Wood'] -= player_wood_amount  # kui playeril on invis VAHEM kui max_value_source amount of food siis see line
-                        fire_source['not_heating'] = False
-
-                    else:  # player_wood_amount > max_value_source:
-                        self.player.inv['Wood'] -= (max_value_source - fire_source['current_wood_inside'])
-                        fire_source['not_heating'] = False
-
-                    fire_source['current_wood_inside'] += player_wood_amount
-                    if max_value_source < fire_source['current_wood_inside']:  fire_source['current_wood_inside'] = max_value_source
-                
-                except Exception: pass
-
-            try: self.draw_fuel_status(position, fire_source['current_wood_inside'], max_value_source)
-            except KeyError as e: print('fix me @ heat_zone.py, def calculate heat status', e)
-
-
-    def draw_fuel_status(self, position, progress, max_progress):
-        if progress == None or max_progress == None: 
-            return  # prevent error
-        
-        current_progress = progress / max_progress
-        
-        # Calculate position on the screen
-        win_pos = (
-            position[0] * self.map.tile_size - self.camera.offset.x + self.map.tile_size // 4,
-            position[1] * self.map.tile_size - self.camera.offset.y + self.map.tile_size // 4
-        )
-
-        img_height = self.tree_log_image.get_height()
-        img_width = self.tree_log_image.get_width()
-
-        visible_height = int(img_height * current_progress)  # kui palju pildist tuleb blittida.
-
-        if visible_height > 0:
-            cropped_image = self.tree_log_image.subsurface((0, img_height - visible_height, img_width, visible_height))
-            adjusted_win_pos = (win_pos[0], win_pos[1] + (img_height - visible_height))  # Adjust drawing position so the cropped image aligns correctly
-
-            self.screen.blit(cropped_image, adjusted_win_pos)
-
-
     def update(self, terrain_in_view):
-        self.create_heat_zone_rect_list()
-        self.calculate_heat_status(False)
         self.update_heat_zone()
+        self.create_heat_zone_rect_list()
         self.draw_all_progress_bars(terrain_in_view)
         self.draw_heat_zones()
 

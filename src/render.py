@@ -2,7 +2,8 @@ import pygame
 import random
 
 class Render:
-    def __init__(self, screen, camera, map, player, clock, tree, images, tile_set, heat_zone, items):
+    def __init__(self, screen, camera, map, player, clock, tree, 
+                 images, tile_set, heat_zone, items, r_sequence):
         self.screen = screen
         self.camera = camera
         self.map = map
@@ -13,6 +14,7 @@ class Render:
         self.tile_set = tile_set
         self.heat_zone = heat_zone
         self.items = items
+        self.r_sequence = r_sequence
 
         ground_path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', ground_path)
@@ -51,12 +53,14 @@ class Render:
         self.blast_furnace_image = self.images.preloading('blast_furnace', blast_furnace_path)
         self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
-
         # listid
         self.water_images = []
         self.ground_images = []
         self.tree_images = []
-        self.combined_images = []
+
+        self.images =  []
+        self.other_images = [] 
+        self.tree_images =  []
 
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
@@ -66,6 +70,7 @@ class Render:
         self.melted_water_values = [0, ]
 
         self.static_map_surface = None  # Will hold the entire static map surface
+
 
     def create_static_map_surface(self):
         # Create a new surface to hold the entire map's static tiles
@@ -103,11 +108,12 @@ class Render:
                     if ground_image:
                         self.static_map_surface.blit(ground_image, position)
 
+
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = []
         # Determine the player's position on the grid
-        player_grid_x = self.player.x // self.map.tile_size
-        player_grid_y = self.player.y // self.map.tile_size
+        player_grid_x = int(self.player.x // self.map.tile_size)
+        player_grid_y = int(self.player.y // self.map.tile_size)
 
         # Define the render range (11x6 visible tiles)
         row_range_0 = max(0, player_grid_y - 3)  # 6 tiles: 3 above and 3 below
@@ -121,6 +127,7 @@ class Render:
                 terrain_in_view.append((col, row))
 
         return terrain_in_view
+
 
     def render_terrain_in_view(self, terrain_in_view):
         self.reset_image_lists()
@@ -161,8 +168,8 @@ class Render:
                 if ground_image:
                     self.ground_images.append((ground_image, position))
 
-        self.combined_images = self.water_images + self.ground_images + self.heat_source_images + self.tree_images
-        self.screen.blits(self.combined_images, doreturn=False)
+        images = (self.water_images, self.ground_images, self.heat_source_images, self.tree_images)
+        return images
 
 
     def render_after_ground(self, terrain_value, position_by_grid, row_idx, col_idx):
@@ -225,7 +232,6 @@ class Render:
         self.water_images = []
         self.ground_images = []
         self.tree_images = []
-        self.combined_images = []
 
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
@@ -237,10 +243,29 @@ class Render:
         pygame.draw.rect(self.screen, color='red', rect=pygame.Rect(player_position_adjusted[0], player_position_adjusted[1], self.player.width, self.player.height))
 
 
-    def update(self):
+    def update(self, render_after, animations):
+        animation_x, animation_y = animations
         terrain_in_view = self.get_terrain_in_view()
-        self.render_terrain_in_view(terrain_in_view)
+        
+        self.images = self.render_terrain_in_view(terrain_in_view)
+        self.other_images = self.images[:3]
+        self.tree_images = self.images[3] # render after if render_after == True
+
+        self.images = self.images[0] + self.images[1] + self.images[2] + self.images[3]
+        self.other_images = self.other_images[0] + self.other_images[1] + self.other_images[2]
+
+        if render_after == True:
+            self.screen.blits(self.other_images, doreturn=False)
+            self.render_player()
+            self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
+            self.screen.blits(self.tree_images, doreturn=False)
+            return
+        
+        self.screen.blits(self.images, doreturn=False)
         self.render_player()
+        self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
+
+            
 
         # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS
 

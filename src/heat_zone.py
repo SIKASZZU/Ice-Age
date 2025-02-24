@@ -11,6 +11,7 @@ class HeatZone:
 
         self.fire_source_dict = {}
         self.position_upgradable = []
+        self.position_upgradable = []
 
         # self.fire_source_dict = {
         # position: {
@@ -65,6 +66,7 @@ class HeatZone:
         self.allow_new_heat_source_list = 'Blast Furnace', 'Furnace', 'Bonfire', 'Campfire', 'Firepit', 'Torch'
         self.radius = 0
         self.new_heat_source = "Torch"
+        self.new_heat_source = "Torch"
         self.new_heat_source_cost = 8  # Wood
 
         self.all_fire_source_list = self.map.get_terrain_value_positions(20)
@@ -110,6 +112,7 @@ class HeatZone:
             minus = radius
             plus = radius + 1
 
+
             fire_x, fire_y = pos
 
             if real_stage != stage:
@@ -146,6 +149,8 @@ class HeatZone:
     def feed_heat_source(self, mouse_pos):
         for pos, rect in self.fire_source_rect_list:
             if rect.collidepoint(mouse_pos):
+                self.upgrade_fire_source_stage(pos)
+                break
                 self.upgrade_fire_source_stage(pos)
                 break
 
@@ -239,6 +244,7 @@ class HeatZone:
 
         if item not in self.player.inv or self.player.inv[item] <= 0:
             return  # No wood in inventory to feed
+            return  # No wood in inventory to feed
 
         # Get the required amount to upgrade
         required_to_upgrade = self.heat_zone_stages[current_stage] - current_count
@@ -270,6 +276,7 @@ class HeatZone:
                 # Remove the amount needed for this upgrade from the count
                 self.fire_source_dict[pos]['count'] -= self.heat_zone_stages[current_stage]
 
+
                 self.map.data[pos] = self.heat_zones_id_dict[next_stage]
 
         if pos in self.position_upgradable: 
@@ -285,6 +292,7 @@ class HeatZone:
         # Check for interaction with a tree to create a new fire source
         for tree_pos, tree_rect in tree_rect_dict.items():
             if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
+
                 # Add a new fire source at the tree's position
                 new_fire_source = {
                     'stage': 'Torch',
@@ -387,10 +395,9 @@ class HeatZone:
 
     def update(self, terrain_in_view):
         self.update_heat_zone()
+        self.update_heat_zone()
         self.create_heat_zone_rect_list()
         self.draw_all_progress_bars(terrain_in_view)
         self.draw_heat_zones()
 
         self.heat_zone_status()
-
-

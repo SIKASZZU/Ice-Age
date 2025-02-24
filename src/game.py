@@ -1,19 +1,21 @@
 import pygame
 import jurigged
 
-from weather import Weather
+from items import Items
 from map import Map
 from tree import Tree
 from camera import Camera
 from player import Player
 from render import Render
 from images import Images
+from weather import Weather
 from tileset import TileSet
 from heat_zone import HeatZone
 from framerate import Framerate
+from collision import Collision
+from render_sequence import RenderSequence
 
 jurigged.watch()
-
 
 class Game:
     def __init__(self):
@@ -25,14 +27,18 @@ class Game:
 
         # Initialize game components
         self.camera = Camera()
+        self.items = Items()
         self.map = Map(self.screen, self.camera)
         self.images = Images()
-        self.player = Player(self.screen, self.camera, self.map, self.font, self.images)
+        self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
         self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone)
+        self.collision = Collision(self.player, self.tree, self.map, self.screen, self.camera)
+        self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, 
+                               self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
 
@@ -46,19 +52,23 @@ class Game:
 
         self.rects_window_coord = self.tree.calculate_rects()
 
-
         self.required_wood = self.heat_zone.new_heat_source_cost
-
+        
 
     def logic(self):
         self.camera.update(self.player.rect)  # Keep camera updated with player position
+        self.r_sequence.update()
+        self.collision.update()
 
 
     def render(self, mouse_pos):
         terrain_in_view = self.renderer.get_terrain_in_view()
 
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
-        self.renderer.update()
+        animations = self.player.update(False)  # Alati enne renderer'i
+        self.renderer.update(self.r_sequence.render_after, animations)
+        self.collision.draw_rects()
+        self.player.update(render_inv=True)
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()
 
@@ -66,7 +76,6 @@ class Game:
         if self.rects_window_coord:
             self.heat_zone.display_new_heat_source_cost(mouse_pos, self.rects_window_coord, self.tree_position_coord, self.required_wood)
 
-        self.player.update()  # Alati enne renderer'i
 
         self.heat_zone.update(terrain_in_view)
 

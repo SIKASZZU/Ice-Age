@@ -13,6 +13,8 @@ class Tree:
 
         self.width = self.map.tile_size * 1.75
         self.height = self.map.tile_size * 2.5
+        self.rect_width = 0
+        self.rect_height = 0
 
         self.total_trees_harvested = 0
         self.resource_stages = {
@@ -51,12 +53,14 @@ class Tree:
         self.img = self.images.preloading('tree', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
 
+
     def change_stage(self):
         current_heat_source_stage = self.heat_zone.fire_source_dict[self.heat_zone.fire_source_grid]['stage']
         if current_heat_source_stage in self.resource_stages:
             self.resource_value = self.resource_stages[current_heat_source_stage]
         else:
             self.resource_value = {}
+
 
     def gather(self, position=None, required_wood=None):
         if position:
@@ -97,10 +101,12 @@ class Tree:
                 # removib listidest
                 self.tree_position_coord.pop(position)
                 self.rects_map_coord.pop(position)
+                print(len(self.rects_map_coord), 'tree.py')
                 self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
             except Exception as e: 
                 print('Tree removing error @ Tree.gather()', e)
             break  # kui ei breaki, siis error, et self.rects_map_coord dict changed sizes during iteration.
+
 
     def spawn(self):
         pass

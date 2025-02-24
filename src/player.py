@@ -177,20 +177,22 @@ class Player:
         # print(self.cold_tolerance, 'self.cold_tolerance')
         # print(self.cold_status, 'self.cold_status')
 
-    def update(self):
+    def update(self, render_inv):
+        if render_inv == False:
+            self.movement()
+            self.cold_regulator()
+            self.animations[self.current_animation].update()
 
-        self.movement()
-        self.cold_regulator()
-        self.animations[self.current_animation].update()
+            ### Animatsion, player Spritei keskele viimine ###
+            sprite_size = self.frame_size * self.scale_factor
 
-        ### Animatsion, player Spritei keskele viimine ###
-        sprite_size = self.frame_size * self.scale_factor
-
-        # sprite_size on sprite keskkoha viimine ruudu vasakusse nurka. 
-        # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
-        animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
-        animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
+            # sprite_size on sprite keskkoha viimine ruudu vasakusse nurka. 
+            # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
+            animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
+            animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
+            
+        if render_inv == True:
+            self.inventory_display()
+            return
         
-        self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
-
-        self.inventory_display()
+        return (animation_x, animation_y)

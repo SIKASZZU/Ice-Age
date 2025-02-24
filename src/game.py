@@ -67,7 +67,6 @@ class Game:
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
         animations = self.player.update(False)  # Alati enne renderer'i
         self.renderer.update(self.r_sequence.render_after, animations)
-        self.collision.draw_rects()
         self.player.update(render_inv=True)
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()

@@ -101,8 +101,8 @@ class Tree:
                 # removib listidest
                 self.tree_position_coord.pop(position)
                 self.rects_map_coord.pop(position)
-                print(len(self.rects_map_coord), 'tree.py')
                 self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
+
             except Exception as e: 
                 print('Tree removing error @ Tree.gather()', e)
             break  # kui ei breaki, siis error, et self.rects_map_coord dict changed sizes during iteration.
@@ -148,6 +148,6 @@ class Tree:
         self.change_stage()
         self.calculate_rects()
         self.gather()
-        self.draw_rects()
+        # self.draw_rects()
 
         return self.rects_window_coord, self.tree_position_coord

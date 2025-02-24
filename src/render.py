@@ -54,13 +54,15 @@ class Render:
         self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
         # listid
-        self.water_images = []
+        self.water_images  = []
         self.ground_images = []
-        self.tree_images = []
+        self.tree_images   = []
+        self.tree_images_before = []  # before on aeg, ehk before playerit tuleb need pildid renderida
+        self.tree_images_after  = []
 
-        self.images =  []
-        self.other_images = [] 
-        self.tree_images =  []
+        self.combined_images = []  # koik pildid koos, mis peavad renderitud olema
+        self.images_witho_afters = []  # siin listis ei ole tree'sid, mis peavad after player renderitud olema.
+        self.tree_images =  []  # koik tree pildid koos
 
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
@@ -204,9 +206,15 @@ class Render:
 
             # Append tree image and position
             tree_position = (
-            position[0] - self.camera.offset.x - (self.tree.width // 4), position[1] - self.camera.offset.y - (self.tree.height // 2))  #
+            position[0] - self.camera.offset.x - (self.tree.width // 4), position[1] - self.camera.offset.y - (self.tree.height // 2))
 
             self.tree_images.append((self.tree.image, tree_position))
+
+            if position_by_grid in self.r_sequence.render_after_player:
+                self.tree_images_after.append((self.tree.image, tree_position))                
+
+            else:
+                self.tree_images_before.append((self.tree.image, tree_position))
 
         # heat source
         if terrain_value in [20, 25, 30, 35, 40, 45, 120, 125, 130, 135, 140, 145]:
@@ -233,6 +241,12 @@ class Render:
         self.ground_images = []
         self.tree_images = []
 
+        self.tree_images_before = []
+        self.tree_images_after = []
+
+        self.images_witho_afters = []
+        self.combined_images = []
+
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
 
@@ -247,21 +261,21 @@ class Render:
         animation_x, animation_y = animations
         terrain_in_view = self.get_terrain_in_view()
         
-        self.images = self.render_terrain_in_view(terrain_in_view)
-        self.other_images = self.images[:3]
-        self.tree_images = self.images[3] # render after if render_after == True
+        self.combined_images = self.render_terrain_in_view(terrain_in_view)
+        self.images_witho_afters = self.combined_images[:3]
+        self.tree_images = self.combined_images[3] # render after if render_after == True
 
-        self.images = self.images[0] + self.images[1] + self.images[2] + self.images[3]
-        self.other_images = self.other_images[0] + self.other_images[1] + self.other_images[2]
+        self.combined_images = self.combined_images[0] + self.combined_images[1] + self.combined_images[2] + self.combined_images[3]
+        self.images_witho_afters = self.images_witho_afters[0] + self.images_witho_afters[1] + self.images_witho_afters[2] + self.tree_images_before
 
         if render_after == True:
-            self.screen.blits(self.other_images, doreturn=False)
+            self.screen.blits(self.images_witho_afters, doreturn=False)
             self.render_player()
             self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
-            self.screen.blits(self.tree_images, doreturn=False)
+            self.screen.blits(self.tree_images_after, doreturn=False)
             return
         
-        self.screen.blits(self.images, doreturn=False)
+        self.screen.blits(self.combined_images, doreturn=False)
         self.render_player()
         self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
 

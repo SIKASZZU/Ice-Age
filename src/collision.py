@@ -60,17 +60,13 @@ class Collision:
             if min_dx < min_dy:
                 if dx_left < dx_right:
                     self.player.x = tree_rect[0] - player_rect[2]  # Push left
-                    print('left')
                 else:
                     self.player.x = tree_rect[0] + tree_rect[2]  # Push right
-                    print('right')
             else:
                 if dy_top < dy_bottom:
                     self.player.y = tree_rect[1] - player_rect[3]  # Push up
-                    print('up')
                 else:
                     self.player.y = tree_rect[1] + tree_rect[3]  # Push down
-                    print('down')
 
 
     def draw_rects(self):

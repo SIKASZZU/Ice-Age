@@ -27,6 +27,8 @@ class RenderSequence:
             if abs(tree_grid[1] - y) > 2:
                 continue
 
+            tree_rect = (tree_rect[0], tree_rect[1], tree_rect[2], tree_rect[3] - tree_rect[3] // 2)
+
             if self.player.rect.colliderect(tree_rect):
                 self.render_after = True
                 break

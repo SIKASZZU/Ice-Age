@@ -190,7 +190,7 @@ class Player:
         # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
         animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
         animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
-        
-        self.animations[self.current_animation].draw(self.screen, animation_x, animation_y)
 
         self.inventory_display()
+
+        return (animation_x, animation_y)

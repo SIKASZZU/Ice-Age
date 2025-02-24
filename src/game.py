@@ -1,6 +1,7 @@
 import pygame
 import jurigged
 
+from render_sequence import RenderSequence
 from weather import Weather
 from map import Map
 from tree import Tree
@@ -32,9 +33,11 @@ class Game:
         self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
         self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone)
+        self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone, self.items)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, 
+                               self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
 
@@ -54,13 +57,15 @@ class Game:
 
     def logic(self):
         self.camera.update(self.player.rect)  # Keep camera updated with player position
+        self.r_sequence.update()
 
 
     def render(self, mouse_pos):
         terrain_in_view = self.renderer.get_terrain_in_view()
 
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
-        self.renderer.update()
+        animations = self.player.update()  # Alati enne renderer'i
+        self.renderer.update(self.r_sequence.render_after, animations)
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()
 
@@ -68,7 +73,6 @@ class Game:
         if self.rects_window_coord:
             self.heat_zone.display_new_heat_source_cost(mouse_pos, self.rects_window_coord, self.tree_position_coord, self.required_wood)
 
-        self.player.update()  # Alati enne renderer'i
 
         self.heat_zone.update(terrain_in_view)
 

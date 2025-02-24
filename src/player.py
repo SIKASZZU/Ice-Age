@@ -45,14 +45,25 @@ class Player:
         }
 
         # Cold
+        self.player_is_cold = False
+        self.player_is_warm = False        
         self.cold_tolerance = 10
         self.damage_by_cold = 1
         self.regen_by_heat  = 1
-        self.cold_status    = 'Ok'  # Extreme, Mild, Ok
+        self.cold_status    = 'Ok'  # NEAR_FROZEN, Extreme, Mild, Ok
         self.last_time_damaged = None
         self.last_time_healed  = None
 
     def movement(self):
+        if self.cold_status == 'MILD':
+            self.movement_speed = 4
+
+        if self.cold_status == 'EXTREME':
+            self.movement_speed = 2
+
+        if self.cold_status == 'NEAR_FROZEN':
+            self.movement_speed = 1                
+
         moving = False
 
         keys = pygame.key.get_pressed()
@@ -152,9 +163,13 @@ class Player:
 
         terrain_value = self.map.data[self.rect.x // self.map.tile_size][self.rect.y // self.map.tile_size]
         current_time = pygame.time.get_ticks()  # time for tracking the last damage,heal
+        
+        self.player_is_cold = False
+        self.player_is_warm = False
 
         # DAMAGE in cold zones (map.py) every 2 sec 1/10 of max health
         if terrain_value in self.items.cold_area:
+            self.player_is_cold = True
             if self.last_time_damaged == None: self.last_time_damaged = current_time
 
             if current_time > self.last_time_damaged + 2000:  # every 2 sec damage by cold
@@ -163,6 +178,7 @@ class Player:
 
         # HEALING in heat_zone every 4 sec heal 1/10 of max health
         if terrain_value in self.items.heated_area:
+            self.player_is_warm = True
             if self.last_time_healed == None: self.last_time_healed = current_time
 
             if current_time > self.last_time_healed + 4000:  # every 4 sec heal by heat_zone
@@ -171,16 +187,19 @@ class Player:
 
         # Cold status -> Selle jargi saab settida ntks movementspeedi
         if self.cold_tolerance >= 8:    self.cold_status = 'OK'
-        elif 3 < self.cold_tolerance <= 7:  self.cold_status = 'MILD'
-        elif self.cold_tolerance <= 3:  self.cold_status = 'EXTREME'
+        elif 4 < self.cold_tolerance <= 7:  self.cold_status = 'MILD'
+        elif 0 < self.cold_tolerance <= 4:  self.cold_status = 'EXTREME'
+        elif self.cold_tolerance == 0:  self.cold_status = 'NEAR_FROZEN'
 
-        # print(self.cold_tolerance, 'self.cold_tolerance')
-        # print(self.cold_status, 'self.cold_status')
+        # print()
+        # print('self.cold_tolerance', self.cold_tolerance)
+        # print('self.cold_status   ', self.cold_status)
+        # print('cold', self.player_is_cold, '          warm', self.player_is_warm)
 
     def update(self, render_inv):
         if render_inv == False:
-            self.movement()
             self.cold_regulator()
+            self.movement()
             self.animations[self.current_animation].update()
 
             ### Animatsion, player Spritei keskele viimine ###

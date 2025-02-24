@@ -112,8 +112,8 @@ class Render:
     def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
         terrain_in_view = []
         # Determine the player's position on the grid
-        player_grid_x = self.player.x // self.map.tile_size
-        player_grid_y = self.player.y // self.map.tile_size
+        player_grid_x = int(self.player.x // self.map.tile_size)
+        player_grid_y = int(self.player.y // self.map.tile_size)
 
         # Define the render range (11x6 visible tiles)
         row_range_0 = max(0, player_grid_y - 3)  # 6 tiles: 3 above and 3 below

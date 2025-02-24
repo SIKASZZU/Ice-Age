@@ -101,6 +101,7 @@ class Tree:
                 # removib listidest
                 self.tree_position_coord.pop(position)
                 self.rects_map_coord.pop(position)
+                print(len(self.rects_map_coord), 'tree.py')
                 self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
             except Exception as e: 
                 print('Tree removing error @ Tree.gather()', e)

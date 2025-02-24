@@ -102,7 +102,11 @@ class HeatZone:
         self.progress_bar_height = 10
         self.progress_bar_width = 100
 
+
     def update_heat_zone(self):
+        self.snow = []
+        self.heat = []
+
         for pos in self.fire_source_dict:
             real_stage = self.fire_source_dict[pos]['stage']
             stage = self.fire_source_dict[pos]['heat range']
@@ -120,37 +124,45 @@ class HeatZone:
                 radius = self.heat_zones_dict[real_stage]
                 minus = radius
                 plus = radius + 1
-                self.fire_source_dict[pos]['heat range'] = real_stage  # Update heat range
-
                 # Update the terrain around the fire source based on the new radius
                 for x in range(fire_y - minus, fire_y + plus):
                     for y in range(fire_x - minus, fire_x + plus):
                         if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                            terrain_value = self.map.data[y, x]
+                            self.snow.append((y, x))
 
-                            # Only change terrain if it's not already in the heat zone
-                            if terrain_value == 100:  # Ground
-                                self.map.data[y, x] = 1  # Mark as Ground near fire
-                            elif terrain_value == 110:  # Trees
-                                self.map.data[y, x] = 10  # Mark as Trees near fire
+                continue
+
 
             # Iterate over the tiles for general heat zone update
             for x in range(fire_y - minus, fire_y + plus):
                 for y in range(fire_x - minus, fire_x + plus):
                     if 0 <= x < self.map.width and 0 <= y < self.map.height:
                         terrain_value = self.map.data[y, x]
+                        self.heat.append((y, x))
 
-                        # Only update tiles that are not already within the fire's heat range
-                        if terrain_value == 1:  # Ground
-                            self.map.data[y, x] = 100  # Ground near fire
-                        elif terrain_value == 10:  # Trees
-                            self.map.data[y, x] = 110  # Trees near fire
+
+
+        for pos in self.snow:
+            if pos in self.heat:
+                self.snow.remove(pos)
+        for y, x in self.snow:
+            terrain_value = self.map.data[y, x]
+            if terrain_value == 100:  # Ground
+                self.map.data[y, x] = 1  # Mark as Ground near fire
+            elif terrain_value == 110:  # Trees
+                self.map.data[y, x] = 10  # Mark as Trees near fire
+
+        for y, x in self.heat:
+            terrain_value = self.map.data[y, x]
+            if terrain_value == 1:  # Ground
+                self.map.data[y, x] = 100  # Mark as Ground near fire
+            elif terrain_value == 10:  # Trees
+                self.map.data[y, x] = 110  # Mark as Trees near fire
+
 
     def feed_heat_source(self, mouse_pos):
         for pos, rect in self.fire_source_rect_list:
             if rect.collidepoint(mouse_pos):
-                self.upgrade_fire_source_stage(pos)
-                break
                 self.upgrade_fire_source_stage(pos)
                 break
 
@@ -167,7 +179,7 @@ class HeatZone:
                 available_space = max_fuel - current_fuel
                 amount = min(self.player.inv['Wood'], available_space)
 
-                self.player.inv['Wood'] -=  amount
+                self.player.inv['Wood'] -= amount
                 self.fire_source_dict[pos]['fuel count'] += amount
                 self.fire_source_dict[pos]['heat range'] = stage
                 return
@@ -243,7 +255,6 @@ class HeatZone:
         item = 'Wood'
 
         if item not in self.player.inv or self.player.inv[item] <= 0:
-            return  # No wood in inventory to feed
             return  # No wood in inventory to feed
 
         # Get the required amount to upgrade

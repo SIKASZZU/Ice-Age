@@ -1,8 +1,5 @@
 > puude kohal olev count vaja ymber paigutada
 > green trees for when tile under tree is heatzone.
-> heat zonei feedimine, et see ei hakkaks ara kustuma
-> right clickiga feedid tuld, left clickiga upgradeid stagei.
-> render after, before ara teha. Also rectidele teha
 > optimize blitting, drawing!!!!!!
 > fire on visuaalselt vaiksem kui seal on vahem puid
 > fire visuaalselt kustub ara kui puid ei ole
@@ -11,8 +8,10 @@
 	> movement keys.
 > HUDi ei lisa
 	> elud on seotud kylma indikaatoriga. Mida kylmem playeril on, seda aeglasemini ta liigub, kuniks surnuks kylmub yhe koha peale.
-> K2ndude lisamine
-	> k2nde saab yles korjata nagu puidki ning annab 1 woodi playerile.
+	> Lisada mangu alguses simple drawing computer hiirest ning siis sinna korvale panna mida kumbki klikk teevad
+	> lisada mangu alguses simple drawing computer keyboardist ning kirjeldada, mida key'd teevad.
+		> spacebar, awsd, 
+
 > gathering timer nii tree'dele, kui ka siis k2ndudele
 > ground, mis on yles soojenenud ning ei muutu kohe tagasi snowyiks.?
 

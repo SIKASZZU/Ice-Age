@@ -5,7 +5,6 @@ from weather import Weather
 from map import Map
 from tree import Tree
 from camera import Camera
-from items import Items
 from player import Player
 from render import Render
 from images import Images
@@ -25,16 +24,15 @@ class Game:
         self.font = pygame.font.Font(None, 50)
 
         # Initialize game components
-        self.items = Items()
         self.camera = Camera()
         self.map = Map(self.screen, self.camera)
         self.images = Images()
-        self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
+        self.player = Player(self.screen, self.camera, self.map, self.font, self.images)
         self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
         self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone, self.items)
+        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, self.images, self.tile_set, self.heat_zone)
         self.weather = Weather(self.screen, self.player)
         self.framerate = Framerate()
 
@@ -89,17 +87,28 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    
                     # Feedi heat_zonei
-                    self.heat_zone.fuel_heat_source(mouse_pos, 'left_click')
+                    self.heat_zone.feed_heat_source(mouse_pos)
 
                     # Asenda puu heat_zoneiga
                     if self.player.inv.get('Wood', 0) >= self.required_wood:  
                         tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
+
+                        for pos in self.heat_zone.fire_source_dict:
+                            print(pos)
+                            for info in self.heat_zone.fire_source_dict[pos]:
+                                print(info, "-", self.heat_zone.fire_source_dict[pos][info])
+
+                            print()
+
                         if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
                             self.tree.gather(tree_pos, self.required_wood)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
-                    self.heat_zone.fuel_heat_source(mouse_pos, 'right_click')
+
+                    # Feedi heat_zonei
+                    self.heat_zone.fuel_heat_source(mouse_pos)
 
             # tickratei lisamine
             current_time = pygame.time.get_ticks()

@@ -4,17 +4,21 @@ import numpy as np
 from noise import pnoise2
 import random
 
+
 class Map:
     def __init__(self, screen, camera):
-        self.width = 100  # Player saab korraga näha max 20 - (1920 / 200 = 19.2 -> 11)
-        self.height = 100  # Player saab korraga näha max 11 - (1080 / 200 = 10.8 -> 6)
-        self.tile_size = 100
+        self.width = 10  # Player saab korraga näha max 20 - (1920 / 200 = 19.2 -> 20 + 1 // 2 -> 11)
+        self.height = 10  # Player saab korraga näha max 11 - (1080 / 200 = 10.8 -> 11 + 1 // 2 -> 6)
+        self.tile_size = 75
         self.screen = screen
         self.camera = camera
 
-        # Initialize data with procedural noise
-        self.data = self.generate_data(width=self.width, height=self.height, seed=random.randint(1, 500))
-
+        # Võtab alati seedi kui on vähemalt 1 puu, mille saaks muuta fire sourceiks
+        self.seed = None
+        self.data = None
+        while self.data is None or self.data.size == 0:  # Check if data is None or empty
+            self.seed = random.randint(1, 500)
+            self.data = self.generate_data(width=self.width, height=self.height, seed=self.seed)
 
     @staticmethod
     def generate_data(width, height, scale=50.0, octaves=6, persistence=0.5, lacunarity=2.0, seed=42):
@@ -60,8 +64,9 @@ class Map:
 
             # Place the heat source at the closest tree
             data[heat_y, heat_x] = 20  # Heat Source
+            return data
 
-        return data
+        return None
 
     def get_terrain_value_positions(self, target_value) -> list:
         if isinstance(target_value, int):  # Single value case

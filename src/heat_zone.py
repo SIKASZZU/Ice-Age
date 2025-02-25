@@ -3,6 +3,9 @@ import pygame
 
 class HeatZone:
     def __init__(self, screen, map, camera, player, images):
+        self.snow = None
+        self.heat = None
+
         self.map = map
         self.camera = camera
         self.screen = screen
@@ -32,10 +35,10 @@ class HeatZone:
             'Campfire': 2,        # ID 30
             'Bonfire': 3,         # ID 35
             'Furnace': 4,         # ID 40
-            'Blast Furnace': 6,   # ID 45
+            'Blast Furnace': 5,   # ID 45
         }
 
-        self.max_fuel_counter = 10
+        self.max_fuel_counter = 20
         self.max_fuel_dict: dict = {
             'Torch': 3,           # ID 20
             'Firepit': 4,         # ID 25
@@ -102,12 +105,12 @@ class HeatZone:
         self.progress_bar_height = 10
         self.progress_bar_width = 100
 
-
     def update_heat_zone(self):
         self.snow = []
         self.heat = []
 
         for pos in self.fire_source_dict:
+
             real_stage = self.fire_source_dict[pos]['stage']
             stage = self.fire_source_dict[pos]['heat range']
             radius = self.heat_zones_dict[stage]
@@ -116,31 +119,26 @@ class HeatZone:
             minus = radius
             plus = radius + 1
 
-
             fire_x, fire_y = pos
 
             if real_stage != stage:
                 # If the fire's real stage has changed, update the heat range and radius
-                radius = self.heat_zones_dict[real_stage]
-                minus = radius
-                plus = radius + 1
+                _radius = self.heat_zones_dict[real_stage]
+                _minus = _radius
+                _plus = _radius + 1
                 # Update the terrain around the fire source based on the new radius
-                for x in range(fire_y - minus, fire_y + plus):
-                    for y in range(fire_x - minus, fire_x + plus):
+                for x in range(fire_y - _minus, fire_y + _plus):
+                    for y in range(fire_x - _minus, fire_x + _plus):
                         if 0 <= x < self.map.width and 0 <= y < self.map.height:
                             self.snow.append((y, x))
 
-                continue
-
+                        continue
 
             # Iterate over the tiles for general heat zone update
             for x in range(fire_y - minus, fire_y + plus):
                 for y in range(fire_x - minus, fire_x + plus):
                     if 0 <= x < self.map.width and 0 <= y < self.map.height:
-                        terrain_value = self.map.data[y, x]
                         self.heat.append((y, x))
-
-
 
         for pos in self.snow:
             if pos in self.heat:
@@ -194,7 +192,14 @@ class HeatZone:
             fuel_counter = self.fire_source_dict[pos]['fuel counter']
 
             if fuel_count <= 0:
-                self.fire_source_dict[pos]['heat range'] = 'Torch'
+                continue
+
+            elif fuel_count == 1 and self.fire_source_dict[pos]['heat range'] is not 'Torch':
+                prev_heat = self.fire_source_dict[pos].get('heat range', 'Torch')
+                heat_levels = list(self.heat_zones_dict.keys())
+                prev_index = max(heat_levels.index(prev_heat) - 1, 0)
+                self.fire_source_dict[pos]['fuel count'] = 3
+                self.fire_source_dict[pos]['heat range'] = heat_levels[prev_index]
                 continue
 
             if fuel_counter < self.max_fuel_counter:
@@ -205,9 +210,6 @@ class HeatZone:
                 self.fire_source_dict[pos]['fuel count'] = fuel_count - 1
                 self.fire_source_dict[pos]['fuel counter'] = 0
 
-        # # Then, print all the fire source data after the loop has finished
-        # for pos in self.fire_source_dict:
-        #     print(self.fire_source_dict[pos])
 
     def draw_heat_source_cost(self, tree_pos, required_wood):
         # Set up the text

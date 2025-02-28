@@ -17,10 +17,12 @@ from render_sequence import RenderSequence
 
 jurigged.watch()
 
+
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1920 // 2, 1080 // 2))  # Set up the game window
+        self.screen_x, self.screen_y = 1920 // 2, 1080 // 2
+        self.screen = pygame.display.set_mode((self.screen_x, self.screen_y))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True 
         self.font = pygame.font.Font(None, 50)
@@ -37,9 +39,8 @@ class Game:
         self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
 
-        self.renderer = Render(self.screen, self.camera, self.map, self.player, self.clock, self.tree, 
-                               self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
-        self.weather = Weather(self.screen, self.player)
+        self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
+        self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
         # Tickrate
@@ -53,7 +54,7 @@ class Game:
         self.rects_window_coord = self.tree.calculate_rects()
 
         self.required_wood = self.heat_zone.new_heat_source_cost
-        
+
 
     def logic(self):
         self.camera.update(self.player.rect)  # Keep camera updated with player position
@@ -95,12 +96,12 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
-                    
+
                     # Feedi heat_zonei
                     self.heat_zone.feed_heat_source(mouse_pos)
 
                     # Asenda puu heat_zoneiga
-                    if self.player.inv.get('Wood', 0) >= self.required_wood:  
+                    if self.player.inv.get('Wood', 0) >= self.required_wood:
                         tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
 
                         for pos in self.heat_zone.fire_source_dict:
@@ -114,8 +115,6 @@ class Game:
                             self.tree.gather(tree_pos, self.required_wood)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
-
-                    # Feedi heat_zonei
                     self.heat_zone.fuel_heat_source(mouse_pos)
 
             # tickratei lisamine

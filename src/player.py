@@ -108,7 +108,7 @@ class Player:
             if self.last_input == "s":
                 self.current_animation = "idle_down"
 
-
+        # TODO: x,y -- grid -- window x,y -- window grid ja ss igalpool nende kasutamine või teha funcid siit
         self.rect.x = self.x
         self.rect.y = self.y
 

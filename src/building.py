@@ -1,13 +1,43 @@
 import pygame
 
 class Building:
-    def __init__(self, map, player):
+    def __init__(self, game, images, map, player):
+        self.game = game
+        self.images = images
         self.map = map
         self.player = player
 
-    def open_menu(self):
-        ...
-        # Clickable icon -> avab menu
+        self.items_to_display = []
+        self.menu_state = False
+
+        self.building_icon_x = self.building_icon_y = 20
+        self.building_menu_pos = self.building_icon_x, self.building_icon_y
+        self.width = self.height = 50
+        building_icon_path = 'res/images/building_icon.png'
+        self.buidling_icon = self.images.preloading('building_icon', building_icon_path)
+        self.buidling_icon = pygame.transform.scale(self.buidling_icon, (self.width, self.height))
+        self.building_icon_rect = pygame.rect.Rect(self.building_menu_pos[0], self.building_menu_pos[1], self.width, self.height)
+
+
+    def toggle_menu(self):
+        self.menu_state = not self.menu_state
+
+        if not self.menu_state:
+            self.items_to_display = []
+        print(f"Building menu: {'ON' if self.menu_state else 'OFF'}")
+
+    def display_menu(self):
+        self.items_to_display = []
+        for i in range(3):
+            x = self.building_icon_x + 10 + self.width + i * 60
+            y = self.building_icon_y
+            self.items_to_display.append((self.buidling_icon, (x, y)))
+
+        if self.items_to_display:
+            self.game.screen.blits(self.items_to_display)
+
+        # Näitab itemeid mida saab ehitada ja mida ei saa.
+        # Nende juures on ka kirjas mida vaja, et neid ehitada.
 
     def allow_building(self):
         ...
@@ -32,15 +62,7 @@ class Building:
         # Kui valitud item + sobiv koht + piisavalt looti playeril -> vasaku clickiga placeib itemi
 
     def update(self):
-        ...
-        # open_menu()
-        # if not open_menu:
-        #   return
-        #
-        # select_item()
-        # allow_building() + hover_effect()
-        # if not allow_building:
-        #   return
-        #
-        #   build_item()
+        self.game.screen.blit(self.buidling_icon, self.building_menu_pos)
 
+        if self.menu_state:
+            self.display_menu()

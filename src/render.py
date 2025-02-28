@@ -2,19 +2,21 @@ import pygame
 import random
 
 class Render:
-    def __init__(self, screen, camera, map, player, clock, tree, 
-                 images, tile_set, heat_zone, items, r_sequence):
-        self.screen = screen
+    def __init__(self, game, camera, map, player, tree, images, tile_set, heat_zone, items, r_sequence):
+        self.game = game
         self.camera = camera
         self.map = map
         self.player = player
-        self.clock = clock
         self.tree = tree
         self.images = images
         self.tile_set = tile_set
         self.heat_zone = heat_zone
         self.items = items
         self.r_sequence = r_sequence
+
+        # Calculate number of tiles covering the full screen
+        self.tiles_x = self.game.screen_x // self.map.tile_size + 1
+        self.tiles_y = self.game.screen_y // self.map.tile_size + 2
 
         ground_path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', ground_path)
@@ -27,7 +29,6 @@ class Render:
         snowy_heated_path = 'res/images/snowy_heated_ground.png'
         self.snowy_heated_image = self.images.preloading('snowy_heated_ground', snowy_heated_path)
         self.snowy_heated_image = pygame.transform.scale(self.snowy_heated_image, (self.map.tile_size, self.map.tile_size))
-
 
         torch_path = 'res/images/torch.png'
         self.torch_image = self.images.preloading('torch', torch_path)
@@ -54,15 +55,15 @@ class Render:
         self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
         # listid
-        self.water_images  = []
+        self.water_images = []
         self.ground_images = []
-        self.tree_images   = []
+        self.tree_images = []
         self.tree_images_before = []  # before on aeg, ehk before playerit tuleb need pildid renderida
-        self.tree_images_after  = []
+        self.tree_images_after = []
 
         self.combined_images = []  # koik pildid koos, mis peavad renderitud olema
         self.images_witho_afters = []  # siin listis ei ole tree'sid, mis peavad after player renderitud olema.
-        self.tree_images =  []  # koik tree pildid koos
+        self.tree_images = []  # koik tree pildid koos
 
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
@@ -110,18 +111,18 @@ class Render:
                     if ground_image:
                         self.static_map_surface.blit(ground_image, position)
 
-
-    def get_terrain_in_view(self):  # FIXME: EI TÖÖTA VIST?
+    def get_terrain_in_view(self):
         terrain_in_view = []
-        # Determine the player's position on the grid
+
+        # Determine player's position on the grid
         player_grid_x = int(self.player.x // self.map.tile_size)
         player_grid_y = int(self.player.y // self.map.tile_size)
 
-        # Define the render range (11x6 visible tiles)
-        row_range_0 = max(0, player_grid_y - 3)  # 6 tiles: 3 above and 3 below
-        row_range_1 = min(self.map.height, player_grid_y + 5)  # 5
-        col_range_0 = max(0, player_grid_x - 5)  # 11 tiles: 5 to the left and 5 to the right
-        col_range_1 = min(self.map.width, player_grid_x + 6)  # 6
+        # Ensure proper left and top coverage
+        row_range_0 = max(0, player_grid_y - (self.tiles_y // 2) - 1)
+        row_range_1 = min(self.map.height, player_grid_y + (self.tiles_y // 2) + 2)
+        col_range_0 = max(0, player_grid_x - (self.tiles_x // 2) - 2)
+        col_range_1 = min(self.map.width, player_grid_x + (self.tiles_x // 2) + 2)
 
         # Collect terrain data within the render range
         for row in range(row_range_0, row_range_1):
@@ -129,7 +130,6 @@ class Render:
                 terrain_in_view.append((col, row))
 
         return terrain_in_view
-
 
     def render_terrain_in_view(self, terrain_in_view):
         self.reset_image_lists()
@@ -142,6 +142,7 @@ class Render:
             if terrain_value in [0]:
                 position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
                 self.water_images.append((self.water_image, position))
+                continue
 
             # terrain
             elif terrain_value in self.items.areas_combined:
@@ -254,7 +255,7 @@ class Render:
     def render_player(self):
         # Adjust player position relative to the camera's offset
         player_position_adjusted = (self.player.rect.x - self.camera.offset.x, self.player.rect.y - self.camera.offset.y)
-        pygame.draw.rect(self.screen, color='red', rect=pygame.Rect(player_position_adjusted[0], player_position_adjusted[1], self.player.width, self.player.height))
+        pygame.draw.rect(self.game.screen, color='red', rect=pygame.Rect(player_position_adjusted[0], player_position_adjusted[1], self.player.width, self.player.height))
 
 
     def update(self, render_after, animations):
@@ -269,19 +270,19 @@ class Render:
         self.images_witho_afters = self.images_witho_afters[0] + self.images_witho_afters[1] + self.images_witho_afters[2] + self.tree_images_before
 
         if render_after == True:
-            self.screen.blits(self.images_witho_afters, doreturn=False)
+            self.game.screen.blits(self.images_witho_afters, doreturn=False)
             self.render_player()
-            self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
-            self.screen.blits(self.tree_images_after, doreturn=False)
+            self.player.animations[self.player.current_animation].draw(self.game.screen, animation_x, animation_y)
+            self.game.screen.blits(self.tree_images_after, doreturn=False)
             return
-        
-        self.screen.blits(self.combined_images, doreturn=False)
+
+        self.game.screen.blits(self.combined_images, doreturn=False)
         self.render_player()
-        self.player.animations[self.player.current_animation].draw(self.screen, animation_x, animation_y)
+        self.player.animations[self.player.current_animation].draw(self.game.screen, animation_x, animation_y)
 
             
 
-        # print(f"FPS: {int(self.clock.get_fps())}")  # Display FPS
+        # print(f"FPS: {int(self.game.clock.get_fps())}")  # Display FPS
 
     # for tree around player in range of 2:
     #     dont render in render_terrain_in_view

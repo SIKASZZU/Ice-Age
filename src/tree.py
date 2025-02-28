@@ -49,8 +49,14 @@ class Tree:
         self.rects_window_coord = {}  # grid: rect // visuaalselt joonistamiseks sobilikud koordinaatidega rectid
         self.rects_map_coord = {}  # grid: rect // map koordinaatide jargi rectid
 
-        path = 'res/images/snowy_tree.png'
-        self.img = self.images.preloading('tree', path)
+        # snowy tree image
+        path_snowy = 'res/images/snowy_tree.png'
+        self.img_snowy = self.images.preloading('tree', path_snowy)
+        self.image_snowy = pygame.transform.scale(self.img_snowy, (self.width, self.height))
+
+        # normal tree image
+        path = 'res/images/tree.png'
+        self.img = self.images.preloading('tree_snowy', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
 
 

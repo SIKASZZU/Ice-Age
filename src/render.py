@@ -178,6 +178,9 @@ class Render:
     def render_after_ground(self, terrain_value, position_by_grid, row_idx, col_idx):
         # tree
         if terrain_value in [10, 110]:
+
+            tree_image = self.tree.image if terrain_value == 110 else self.tree.image_snowy
+
             if position_by_grid in self.tree.tree_position_coord:
                 position = self.tree.tree_position_coord[position_by_grid]
                 # print('position', position)
@@ -209,13 +212,13 @@ class Render:
             tree_position = (
             position[0] - self.camera.offset.x - (self.tree.width // 4), position[1] - self.camera.offset.y - (self.tree.height // 2))
 
-            self.tree_images.append((self.tree.image, tree_position))
+            self.tree_images.append((tree_image, tree_position))
 
             if position_by_grid in self.r_sequence.render_after_player:
-                self.tree_images_after.append((self.tree.image, tree_position))                
+                self.tree_images_after.append((tree_image, tree_position))                
 
             else:
-                self.tree_images_before.append((self.tree.image, tree_position))
+                self.tree_images_before.append((tree_image, tree_position))
 
         # heat source
         if terrain_value in [20, 25, 30, 35, 40, 45, 120, 125, 130, 135, 140, 145]:

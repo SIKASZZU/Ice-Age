@@ -1,13 +1,15 @@
 import pygame
 import random
 
+
 class Weather:
-    def __init__(self, screen, player):
+    def __init__(self, game, screen, player):
+        self.game = game
         self.screen = screen
         self.player = player
 
-        self.screen_width = self.screen.get_width()
-        self.screen_height = self.screen.get_height()
+        self.screen_width = self.game.screen_x
+        self.screen_height = self.game.screen_y
         self.snowflakes = self.create_snowflakes()
 
 

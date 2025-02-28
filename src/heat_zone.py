@@ -130,6 +130,9 @@ class HeatZone:
                 for x in range(fire_y - _minus, fire_y + _plus):
                     for y in range(fire_x - _minus, fire_x + _plus):
                         if 0 <= x < self.map.width and 0 <= y < self.map.height:
+                            if self.map.data[(y, x)] == 0:
+                                continue
+
                             self.snow.append((y, x))
 
                         continue
@@ -138,6 +141,9 @@ class HeatZone:
             for x in range(fire_y - minus, fire_y + plus):
                 for y in range(fire_x - minus, fire_x + plus):
                     if 0 <= x < self.map.width and 0 <= y < self.map.height:
+                        if self.map.data[(y, x)] == 0:
+                            continue
+
                         self.heat.append((y, x))
 
         for pos in self.snow:
@@ -165,22 +171,24 @@ class HeatZone:
                 break
 
     def fuel_heat_source(self, mouse_pos):
+        if 'Wood' not in self.player.inv or self.player.inv['Wood'] <= 0:
+            return
+
         for pos, rect in self.fire_source_rect_list:
             if not rect.collidepoint(mouse_pos):
                 continue
 
-            if 'Wood' in self.player.inv:
-                max_fuel = self.max_fuel_dict[self.fire_source_dict[pos]['stage']]
-                current_fuel = self.fire_source_dict[pos]['fuel count']
-                stage = self.fire_source_dict[pos]['stage']
+            max_fuel = self.max_fuel_dict[self.fire_source_dict[pos]['stage']]
+            current_fuel = self.fire_source_dict[pos]['fuel count']
+            stage = self.fire_source_dict[pos]['stage']
 
-                available_space = max_fuel - current_fuel
-                amount = min(self.player.inv['Wood'], available_space)
+            available_space = max_fuel - current_fuel
+            amount = min(self.player.inv['Wood'], available_space)
 
-                self.player.inv['Wood'] -= amount
-                self.fire_source_dict[pos]['fuel count'] += amount
-                self.fire_source_dict[pos]['heat range'] = stage
-                return
+            self.player.inv['Wood'] -= amount
+            self.fire_source_dict[pos]['fuel count'] += amount
+            self.fire_source_dict[pos]['heat range'] = stage
+            return
 
     def heat_zone_status(self):
         # First, update all the 'fuel count' values

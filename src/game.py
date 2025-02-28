@@ -14,6 +14,7 @@ from heat_zone import HeatZone
 from framerate import Framerate
 from collision import Collision
 from render_sequence import RenderSequence
+from building import Building
 
 jurigged.watch()
 
@@ -38,6 +39,7 @@ class Game:
         self.collision = Collision(self.player, self.tree, self.map, self.screen, self.camera)
         self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
+        self.building = Building(self, self.images, self.map, self.player)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
         self.weather = Weather(self, self.screen, self.player)
@@ -61,7 +63,6 @@ class Game:
         self.r_sequence.update()
         self.collision.update()
 
-
     def render(self, mouse_pos):
         terrain_in_view = self.renderer.get_terrain_in_view()
 
@@ -80,6 +81,7 @@ class Game:
         self.heat_zone.update(terrain_in_view)
 
         self.weather.update()
+        self.building.update()
 
         pygame.display.flip()  # LAST // Update display
 
@@ -96,6 +98,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    if self.building.building_icon_rect.collidepoint(mouse_pos):
+                        self.building.display_menu(mouse_pos)
+                        break
 
                     # Feedi heat_zonei
                     self.heat_zone.feed_heat_source(mouse_pos)
@@ -104,17 +109,13 @@ class Game:
                     if self.player.inv.get('Wood', 0) >= self.required_wood:
                         tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
 
-                        for pos in self.heat_zone.fire_source_dict:
-                            print(pos)
-                            for info in self.heat_zone.fire_source_dict[pos]:
-                                print(info, "-", self.heat_zone.fire_source_dict[pos][info])
-
-                            print()
-
                         if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
                             self.tree.gather(tree_pos, self.required_wood)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
+                    if self.building.building_icon_rect.collidepoint(mouse_pos):
+                        break
+
                     self.heat_zone.fuel_heat_source(mouse_pos)
 
             # tickratei lisamine

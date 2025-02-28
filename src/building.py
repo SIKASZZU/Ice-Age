@@ -33,3 +33,14 @@ class Building:
 
     def update(self):
         ...
+        # open_menu()
+        # if not open_menu:
+        #   return
+        #
+        # select_item()
+        # allow_building() + hover_effect()
+        # if not allow_building:
+        #   return
+        #
+        #   build_item()
+

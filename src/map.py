@@ -7,8 +7,8 @@ import random
 
 class Map:
     def __init__(self, screen, camera):
-        self.width = 10  # Player saab korraga näha max 20 - (1920 / 200 = 19.2 -> 20 + 1 // 2 -> 11)
-        self.height = 10  # Player saab korraga näha max 11 - (1080 / 200 = 10.8 -> 11 + 1 // 2 -> 6)
+        self.width = 50  # Player saab korraga näha max 20 - (1920 / 200 = 19.2 -> 20 + 1 // 2 -> 11)
+        self.height = 50  # Player saab korraga näha max 11 - (1080 / 200 = 10.8 -> 11 + 1 // 2 -> 6)
         self.tile_size = 75
         self.screen = screen
         self.camera = camera
@@ -19,6 +19,7 @@ class Map:
         while self.data is None or self.data.size == 0:  # Check if data is None or empty
             self.seed = random.randint(1, 500)
             self.data = self.generate_data(width=self.width, height=self.height, seed=self.seed)
+
 
     @staticmethod
     def generate_data(width, height, scale=50.0, octaves=6, persistence=0.5, lacunarity=2.0, seed=42):

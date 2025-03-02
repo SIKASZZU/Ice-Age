@@ -14,6 +14,13 @@
 
 > gathering timer nii tree'dele, kui ka siis k2ndudele
 > ground, mis on yles soojenenud ning ei muutu kohe tagasi snowyiks.?
+> playerile lisada reach, ehk yle mapi ei saa feedida tuld
+> fading text lisada
+	> You are mildly cold
+	> You are extremly cold
+	> You don't reach there
+
+> kui puud on heat zoneis ss ajaga muutuvad rohelisemaks. Erinevad staadiumid..
 
 
 Golem

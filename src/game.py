@@ -59,7 +59,7 @@ class Game:
 
 
     def logic(self):
-        self.camera.update(self.player.rect)  # Keep camera updated with player position
+        self.camera.update(self.player.rect)  # Keep camera updated with player pwosition
         self.r_sequence.update()
         self.collision.update()
 
@@ -72,6 +72,7 @@ class Game:
         self.player.update(render_inv=True)
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()
+        #self.collision.draw_rects()
 
         # During hover, show the cost
         if self.rects_window_coord:

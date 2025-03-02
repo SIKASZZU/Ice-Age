@@ -177,10 +177,22 @@ class Render:
 
     def render_after_ground(self, terrain_value, position_by_grid, row_idx, col_idx):
         # tree
-        if terrain_value in [10, 110]:
-
+        if terrain_value in self.items.trees:
+            
             tree_image = self.tree.image if terrain_value == 110 else self.tree.image_snowy
 
+            if terrain_value == 10_5:  
+                tree_image = self.tree.image_lean_left_1_snowy
+            
+            elif terrain_value == 10_6:  
+                tree_image = self.tree.image_lean_left_2_snowy
+            
+            elif terrain_value == 110_5:  
+                tree_image = self.tree.image_lean_left_1
+            
+            elif terrain_value == 110_6:  
+                tree_image = self.tree.image_lean_left_2
+            
             if position_by_grid in self.tree.tree_position_coord:
                 position = self.tree.tree_position_coord[position_by_grid]
                 # print('position', position)

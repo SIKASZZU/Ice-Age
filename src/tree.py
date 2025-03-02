@@ -1,7 +1,6 @@
 import pygame
 import random
 
-
 class Tree:
     def __init__(self, screen, images, map, camera, player, heat_zone):
         self.images = images
@@ -51,13 +50,35 @@ class Tree:
 
         # snowy tree image
         path_snowy = 'res/images/snowy_tree.png'
-        self.img_snowy = self.images.preloading('tree', path_snowy)
+        self.img_snowy = self.images.preloading('tree_snowy', path_snowy)
         self.image_snowy = pygame.transform.scale(self.img_snowy, (self.width, self.height))
 
         # normal tree image
         path = 'res/images/tree.png'
-        self.img = self.images.preloading('tree_snowy', path)
+        self.img = self.images.preloading('tree', path)
         self.image = pygame.transform.scale(self.img, (self.width, self.height))
+
+        # harvestimisel leaning left, et luua animatsioon puule
+        path = 'res/images/tree_lean_left_1.png' 
+        self.img = self.images.preloading('tree_lean_left_1', path)
+        self.image_lean_left_1 = pygame.transform.scale(self.img, (self.width, self.height))
+
+        path = 'res/images/tree_lean_left_2.png' 
+        self.img = self.images.preloading('tree_lean_left_2', path)
+        self.image_lean_left_2 = pygame.transform.scale(self.img, (self.width, self.height))
+
+        path = 'res/images/tree_lean_left_1_snowy.png' 
+        self.img = self.images.preloading('tree_lean_left_1_snowy', path)
+        self.image_lean_left_1_snowy = pygame.transform.scale(self.img, (self.width, self.height))
+
+        path = 'res/images/tree_lean_left_2_snowy.png' 
+        self.img = self.images.preloading('tree_lean_left_2_snowy', path)
+        self.image_lean_left_2_snowy = pygame.transform.scale(self.img, (self.width, self.height))
+
+        self.harvest_times = {}  # Igal tree'l on oma harvest time
+        self.latest_harvest = pygame.time.get_ticks()
+        self.anim_change_timings = (300, 1500)
+        self.pick_up_time = 3000
 
 
     def change_stage(self):
@@ -80,38 +101,80 @@ class Tree:
 
             return True
 
-        # pick uppimine kaib real coordide jargi, mitte windowi
+        ### pick uppimine kaib real coordide jargi, mitte windowi
+        current_time = pygame.time.get_ticks()
+
+        if self.harvest_times:
+            positions_to_pop = []
+            for pos, timings in self.harvest_times.items():
+                change_interval = random.randint(self.anim_change_timings[0], self.anim_change_timings[1])
+                x_grid, y_grid = pos
+                time_of_harvest, last_anim_update = timings
+
+                if current_time - time_of_harvest < self.pick_up_time and current_time - last_anim_update > change_interval:
+                    self.harvest_times[pos] = (time_of_harvest, current_time)
+
+                    if self.map.data[x_grid, y_grid] in [10]:
+                        self.map.data[x_grid, y_grid] = 10_5
+
+                    elif self.map.data[x_grid, y_grid] in [10_5]:
+                        self.map.data[x_grid, y_grid] = 10_6
+
+                    elif self.map.data[x_grid, y_grid] in [10_6]:
+                        self.map.data[x_grid, y_grid] = 10_5
+
+                    elif self.map.data[x_grid, y_grid] in [110]:
+                        self.map.data[x_grid, y_grid] = 110_5
+
+                    elif self.map.data[x_grid, y_grid] in [110_5]:
+                        self.map.data[x_grid, y_grid] = 110_6
+
+                    elif self.map.data[x_grid, y_grid] in [110_6]:
+                        self.map.data[x_grid, y_grid] = 110_5
+                                         
+
+                if current_time - time_of_harvest > self.pick_up_time:
+                    positions_to_pop.append(pos)
+
+            for pos_to_pop in positions_to_pop:
+                self.gather_tree_at_pos(pos_to_pop)
+                self.harvest_times.pop(pos_to_pop)
+
         for tree in self.rects_map_coord.items():
             position, tree_rect = tree
             if not self.player.rect.colliderect(tree_rect):
                 continue
 
-            # TODO: lisada puude lohkumisele cooldown, animatsioon puudele
             keys = pygame.key.get_pressed()
             if not keys[pygame.K_SPACE]:
                 continue
-            
-            try:
-                # Lisab saadud itemid invi
-                resources_collected = {
-                    resource: random.randint(value_range[0], value_range[1])
-                    for resource, value_range in self.resource_value.items()
-                }
 
-                # Add each resource to the player's inventory
-                for resource, amount in resources_collected.items():
-                    self.player.add_items(item_name=resource, amount=amount+100)
+            if position not in self.harvest_times:
+                self.harvest_times[position] = (current_time, current_time)
 
-                self.total_trees_harvested += 1
 
-                # removib listidest
-                self.tree_position_coord.pop(position)
-                self.rects_map_coord.pop(position)
-                self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
+    def gather_tree_at_pos(self, position):
+        """ Extension function of tree.gather()"""
+        try:
+            # Lisab saadud itemid invi
+            resources_collected = {
+                resource: random.randint(value_range[0], value_range[1])
+                for resource, value_range in self.resource_value.items()
+            }
 
-            except Exception as e: 
-                print('Tree removing error @ Tree.gather()', e)
-            break  # kui ei breaki, siis error, et self.rects_map_coord dict changed sizes during iteration.
+            # Add each resource to the player's inventory
+            for resource, amount in resources_collected.items():
+                self.player.add_items(item_name=resource, amount=amount+100)
+
+            self.total_trees_harvested += 1
+
+            # removib listidest
+            self.tree_position_coord.pop(position)
+            self.rects_map_coord.pop(position)
+            self.map.data[position[0]][position[1]] = 1  # muudab terrain value puu asemel groundiks
+
+        except Exception as e: 
+            print('Tree removing error @ Tree.gather()', e)
 
 
     def spawn(self):
@@ -124,25 +187,26 @@ class Tree:
 
         # draw rect kaib windowi jargi.
         for position, coord in self.tree_position_coord.items():
-            # need vaartused tunduvad vb lambised, aga need on mul tapselt vaadatud maitse jargi.
-            # kui tree rect tundub perses ss x,y width ja height on su parimad sobrad
-            width = round(self.width - (self.width // 1.4) // 1.5, 2)
-            height = round(self.height - (self.height // 2) // 1.5, 2)
+            
+            if position not in self.rects_window_coord:
+                # need vaartused tunduvad vb lambised, aga need on mul tapselt vaadatud maitse jargi.
+                # kui tree rect tundub perses ss x,y width ja height on su parimad sobrad
+                width = round(self.width - (self.width // 1.4), 2)
+                height = round(self.height - (self.height // 2), 2)
 
-            #### Visuaalsete (window coordinaatide pohine) rectide listi tegemine ####
-            x_for_rect = round(coord[0] - self.camera.offset.x, 2)
-            y_for_rect = round((coord[1] - self.camera.offset.y) - self.height + self.map.tile_size * 2, 2)
-            self.rects_window_coord[position] = pygame.Rect(
-                x_for_rect, y_for_rect, width, height)
+                #### Visuaalsete (window coordinaatide pohine) rectide listi tegemine ####
+                x_for_rect = round(coord[0] - self.camera.offset.x + self.width // 8, 2)
+                y_for_rect = round((coord[1] - self.camera.offset.y) - self.height + self.map.tile_size * 2, 2)
+                self.rects_window_coord[position] = pygame.Rect(
+                    x_for_rect, y_for_rect, width, height)
 
             #### Coordinaatide pohine rectide list // SELLE JARGI TOIMUB KA PICK UPPIMINE ####
-            if position in self.rects_map_coord:
-                continue
+            if position not in self.rects_map_coord:
 
-            x = round(coord[0], 2)
-            y = round(coord[1] - self.height + self.map.tile_size * 2, 2)
-            tree_rect = (x, y, width, height)
-            self.rects_map_coord[position] = tree_rect
+                x = round(x_for_rect + self.camera.offset.x, 2)
+                y = round(y_for_rect + self.camera.offset.y, 2)
+                tree_rect = (x, y, width, height)
+                self.rects_map_coord[position] = tree_rect
 
     def draw_rects(self):
         # Drawing tree rects
@@ -154,6 +218,6 @@ class Tree:
         self.change_stage()
         self.calculate_rects()
         self.gather()
-        # self.draw_rects()
+        #self.draw_rects()
 
         return self.rects_window_coord, self.tree_position_coord

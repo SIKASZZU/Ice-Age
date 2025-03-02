@@ -20,7 +20,7 @@ class Collision:
         for tree in self.tree.rects_map_coord.items():
             tree_grid, tree_rect = tree
 
-            tree_rect = (tree_rect[0] + 20, tree_rect[1] + 20, tree_rect[2] - 40, tree_rect[3] - 40,)
+            tree_rect = (tree_rect[0] +2, tree_rect[1] +2, tree_rect[2] -4, tree_rect[3]-4)
 
 
             # check options close to player
@@ -29,7 +29,7 @@ class Collision:
                     self.rect_list.remove(tree_rect)
                 continue
                 
-            if abs(tree_grid[1] - y) > 1:
+            if abs(tree_grid[1] - y) > 2:
                 if tree_rect in self.rect_list:
                     self.rect_list.remove(tree_rect)
                 continue
@@ -72,7 +72,7 @@ class Collision:
     def draw_rects(self):
         for rect in self.rect_list:
             rect = (rect[0] - self.camera.offset.x, rect[1] - self.camera.offset.y, rect[2], rect[3])
-            pygame.draw.rect(self.screen, 'limegreen', rect, 10, 4)
+            pygame.draw.rect(self.screen, 'limegreen', rect, 6, 8)
 
 
     def update(self):

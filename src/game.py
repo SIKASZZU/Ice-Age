@@ -35,7 +35,7 @@ class Game:
         self.images = Images()
         self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
         self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
-        self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone)
+        self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone, self.items)
         self.collision = Collision(self.player, self.tree, self.map, self.screen, self.camera)
         self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)

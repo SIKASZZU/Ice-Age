@@ -2,13 +2,14 @@ import pygame
 import random
 
 class Tree:
-    def __init__(self, screen, images, map, camera, player, heat_zone):
+    def __init__(self, screen, images, map, camera, player, heat_zone, items):
         self.images = images
         self.map = map
         self.screen = screen
         self.camera = camera
         self.player = player
         self.heat_zone = heat_zone
+        self.items = items
 
         self.width = self.map.tile_size * 1.75
         self.height = self.map.tile_size * 2.5
@@ -75,6 +76,9 @@ class Tree:
         self.img = self.images.preloading('tree_lean_left_2_snowy', path)
         self.image_lean_left_2_snowy = pygame.transform.scale(self.img, (self.width, self.height))
 
+        self.cut_anim_sorted_snowy = [10, 10_5, 10_6]
+        self.cut_anim_sorted       = [110, 110_5, 110_6]
+
         self.harvest_times = {}  # Igal tree'l on oma harvest time
         self.latest_harvest = pygame.time.get_ticks()
         self.anim_change_timings = (300, 1500)
@@ -109,29 +113,19 @@ class Tree:
             for pos, timings in self.harvest_times.items():
                 change_interval = random.randint(self.anim_change_timings[0], self.anim_change_timings[1])
                 x_grid, y_grid = pos
-                time_of_harvest, last_anim_update = timings
+                time_of_harvest, last_anim_update, cut_anim_index = timings
 
                 if current_time - time_of_harvest < self.pick_up_time and current_time - last_anim_update > change_interval:
-                    self.harvest_times[pos] = (time_of_harvest, current_time)
+                    cut_anim_index +=1  # select next animation in cut animation
+                    cut_anim_index %=3  # arvuta ymber et index pysis range 0-2 ehk reminder of max list value
+                    self.harvest_times[pos] = (time_of_harvest, current_time, cut_anim_index)
+                    terrain_value = self.map.data[x_grid, y_grid]
+                    
+                    if terrain_value in self.items.cold_area:
+                        self.map.data[x_grid, y_grid] = self.cut_anim_sorted_snowy[cut_anim_index]
 
-                    if self.map.data[x_grid, y_grid] in [10]:
-                        self.map.data[x_grid, y_grid] = 10_5
-
-                    elif self.map.data[x_grid, y_grid] in [10_5]:
-                        self.map.data[x_grid, y_grid] = 10_6
-
-                    elif self.map.data[x_grid, y_grid] in [10_6]:
-                        self.map.data[x_grid, y_grid] = 10_5
-
-                    elif self.map.data[x_grid, y_grid] in [110]:
-                        self.map.data[x_grid, y_grid] = 110_5
-
-                    elif self.map.data[x_grid, y_grid] in [110_5]:
-                        self.map.data[x_grid, y_grid] = 110_6
-
-                    elif self.map.data[x_grid, y_grid] in [110_6]:
-                        self.map.data[x_grid, y_grid] = 110_5
-                                         
+                    elif terrain_value in self.items.heated_area:
+                        self.map.data[x_grid, y_grid] = self.cut_anim_sorted[cut_anim_index]
 
                 if current_time - time_of_harvest > self.pick_up_time:
                     positions_to_pop.append(pos)
@@ -150,7 +144,7 @@ class Tree:
                 continue
 
             if position not in self.harvest_times:
-                self.harvest_times[position] = (current_time, current_time)
+                self.harvest_times[position] = (current_time, current_time, 0)
 
 
     def gather_tree_at_pos(self, position):

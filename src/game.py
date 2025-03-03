@@ -39,9 +39,9 @@ class Game:
         self.collision = Collision(self.player, self.tree, self.map, self.screen, self.camera)
         self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
-        self.building = Building(self, self.images, self.map, self.player)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
+        self.building = Building(self, self.images, self.map, self.player, self.renderer)
         self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
@@ -63,7 +63,7 @@ class Game:
         self.r_sequence.update()
         self.collision.update()
 
-    def render(self, mouse_pos):
+    def render(self):
         terrain_in_view = self.renderer.get_terrain_in_view()
 
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
@@ -72,11 +72,11 @@ class Game:
         self.player.update(render_inv=True)
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()
-        #self.collision.draw_rects()
+        # self.collision.draw_rects()
 
         # During hover, show the cost
-        if self.rects_window_coord:
-            self.heat_zone.display_new_heat_source_cost(mouse_pos, self.rects_window_coord, self.tree_position_coord, self.required_wood)
+        # if self.rects_window_coord:
+        #     self.heat_zone.display_new_heat_source_cost(mouse_pos, self.rects_window_coord, self.tree_position_coord, self.required_wood)
 
 
         self.heat_zone.update(terrain_in_view)
@@ -90,8 +90,6 @@ class Game:
         """Main game loop."""
 
         while self.running:
-            self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2  # mdv xD
-            mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
             current_fps = self.clock.get_fps()
 
             # Handle events
@@ -99,12 +97,15 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+                    mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
+
                     if self.building.building_icon_rect.collidepoint(mouse_pos):
                         self.building.toggle_menu()
                         break
 
                     # Feedi heat_zonei
                     self.heat_zone.feed_heat_source(mouse_pos)
+                    self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2  # mdv xD
 
                     # Asenda puu heat_zoneiga
                     if self.player.inv.get('Wood', 0) >= self.required_wood:
@@ -114,6 +115,8 @@ class Game:
                             self.tree.gather(tree_pos, self.required_wood)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
+                    mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
+
                     if self.building.building_icon_rect.collidepoint(mouse_pos):
                         break
 
@@ -125,7 +128,7 @@ class Game:
                 
                 # RUNS AT TICKRATE SPEED
                 self.logic()
-                self.render(mouse_pos)
+                self.render()
                 self.last_tick = current_time
 
                 # print(f"FPS: {current_fps:.2f} | Tick Rate: {self.TICK_RATE}")

@@ -149,7 +149,8 @@ class Player:
             text_amount = str(self.inv[item])
 
         text_surface = self.font.render(text_amount, True, 'gray')
-        text_rect = text_surface.get_rect(center=(self.screen.get_width() // 2 + 35, self.screen.get_height() // 2 - 70))
+        screen_center_pos = self.screen.get_width() // 2 + 35, self.screen.get_height() // 2 - 70
+        text_rect = text_surface.get_rect(center=screen_center_pos)
 
 
         # log_rect  = text_surface.get_rect(center=(self.screen.get_width() // 2 - 35, self.screen.get_height() // 2 - 65))
@@ -197,7 +198,8 @@ class Player:
         # print('cold', self.player_is_cold, '          warm', self.player_is_warm)
 
     def update(self, render_inv):
-        if render_inv == False:
+        animation_x = animation_y = None
+        if not render_inv:
             self.cold_regulator()
             self.movement()
             self.animations[self.current_animation].update()
@@ -210,8 +212,8 @@ class Player:
             animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
             animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
             
-        if render_inv == True:
+        if render_inv:
             self.inventory_display()
             return
         
-        return (animation_x, animation_y)
+        return animation_x, animation_y

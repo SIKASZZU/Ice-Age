@@ -38,7 +38,7 @@ class HeatZone:
             'Blast Furnace': 5,   # ID 45
         }
 
-        self.max_fuel_counter = 20
+        self.max_fuel_counter = 200
         self.max_fuel_dict: dict = {
             'Torch': 3,           # ID 20
             'Firepit': 4,         # ID 25

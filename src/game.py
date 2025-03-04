@@ -29,7 +29,7 @@ class Game:
         self.font = pygame.font.Font(None, 50)
 
         # Initialize game components
-        self.camera = Camera()
+        self.camera = Camera(self)
         self.items = Items()
         self.map = Map(self.screen, self.camera)
         self.images = Images()

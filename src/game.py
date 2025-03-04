@@ -41,7 +41,7 @@ class Game:
         self.tile_set = TileSet(self.images, self.map)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
-        self.building = Building(self, self.images, self.map, self.player, self.renderer)
+        self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera)
         self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
@@ -81,6 +81,10 @@ class Game:
 
         self.heat_zone.update(terrain_in_view)
 
+        if self.building.selected_item:
+            # TODO: Kui on player range'is ss hover effect ??? Dunno mis arvad? Y/N ----->>>
+            self.building.hover_effect()
+
         self.weather.update()
         self.building.update()
 
@@ -99,9 +103,23 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                     mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
+                    # Building ICON
                     if self.building.building_icon_rect.collidepoint(mouse_pos):
                         self.building.toggle_menu()
                         break
+
+                    # Valib itemi ja ehitab
+                    if self.building.menu_state:
+
+                        # Valib itemi
+                        if self.building.select_item(mouse_pos):  # Returns - True / False
+                            break
+
+                        # Ehitab
+                        if self.building.selected_item and self.building.selected_item_pos and self.building.can_place_selected_item:
+                            if self.building.allow_building:
+                                self.building.build_item()
+                                break
 
                     # Feedi heat_zonei
                     self.heat_zone.feed_heat_source(mouse_pos)

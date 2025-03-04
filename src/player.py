@@ -1,6 +1,7 @@
 import pygame
 from sprite import Sprite
 
+
 class Player:
     def __init__(self, screen, camera, map, font, images, items):
         self.screen = screen
@@ -55,14 +56,15 @@ class Player:
         self.last_time_healed  = None
 
     def movement(self):
+        # FIXME: Kui pelama hakkab ss muuta õigeks
         if self.cold_status == 'MILD':
-            self.movement_speed = 4
+            self.movement_speed = 10
 
         if self.cold_status == 'EXTREME':
-            self.movement_speed = 2
+            self.movement_speed = 10
 
         if self.cold_status == 'NEAR_FROZEN':
-            self.movement_speed = 1                
+            self.movement_speed = 10
 
         moving = False
 
@@ -184,7 +186,7 @@ class Player:
 
             if current_time > self.last_time_healed + 4000:  # every 4 sec heal by heat_zone
                 self.last_time_healed = current_time
-                if self.cold_tolerance < 10: self.cold_tolerance += self.regen_by_heat
+                if self.cold_tolerance < 10:self.cold_tolerance += self.regen_by_heat
 
         # Cold status -> Selle jargi saab settida ntks movementspeedi
         if self.cold_tolerance >= 8:    self.cold_status = 'OK'
@@ -195,7 +197,7 @@ class Player:
         # print()
         # print('self.cold_tolerance', self.cold_tolerance)
         # print('self.cold_status   ', self.cold_status)
-        # print('cold', self.player_is_cold, '          warm', self.player_is_warm)
+        # print('cold', self.player_is_cold, 'warm', self.player_is_warm)
 
     def update(self, render_inv):
         animation_x = animation_y = None

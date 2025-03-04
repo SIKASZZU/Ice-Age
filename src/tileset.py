@@ -97,7 +97,7 @@ class TileSet:
         tileset_image = self.snowy_ground_snowy_heated_ground_tileset_image  # Preloaded tileset image
 
         if top_empty and bottom_empty and left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 1)  # Center tile
+            return self.get_tile(tileset_image, self.map.tile_size, 5, 1)  # Center tile
 
         # Three sides empty
         if top_empty and bottom_empty and left_empty:

@@ -23,7 +23,7 @@ class Camera:
         self.offset.x = target.centerx - self.half_w
         self.offset.y = target.centery - self.half_h
 
-    def click_to_world_coordinate(self, player_rect_center, mouse_pos):
+    def click_to_world_coordinates(self, player_rect_center, mouse_pos):
         """
         Converts mouse position to world coordinates.
 

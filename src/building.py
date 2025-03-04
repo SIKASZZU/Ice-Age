@@ -195,7 +195,7 @@ class Building:
 
         world_x, world_y = world_grid_x * self.map.tile_size - self.camera.offset.x, world_grid_y * self.map.tile_size - self.camera.offset.y
 
-        if self.map.data[grid_x][grid_y] in [1, 100]:
+        if self.map.data[world_grid_x][world_grid_y] in [1, 100]:
             image = self.buildings_dict[self.selected_item]['can_place']
             self.can_place_selected_item = True
         else:

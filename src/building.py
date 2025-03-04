@@ -86,7 +86,27 @@ class Building:
         # Ect...
 
     def hover_effect(self):
-        ...
+
+        """CHAT GPT TEXT EI TÖÖTA ILMSELT LIC PANIN SIIA HETKEL"""
+        
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Check if the player has selected an item to build
+        if self.selected_item:
+            size_key = f"{self.selected_item}_{self.width}x{self.height}"
+            hover_image = self.scaled_images[size_key]
+            hover_rect = hover_image.get_rect(center=mouse_pos)
+        
+            # Check if the hover position is within the player's range
+            if self.is_within_player_range(mouse_pos):
+                # Display the pre-built image with a green tint or lower transparency
+                hover_image.set_alpha(128)  # Semi-transparent
+            else:
+                # Display the pre-built image with a red tint
+                hover_image = hover_image.copy()  # Create a copy to avoid modifying the original image
+                hover_image.fill((255, 0, 0, 128), special_flags=pygame.BLEND_RGBA_MULT)
+
+            self.game.screen.blit(hover_image, hover_rect.topleft)
         # Kui valid ja hover'id player'i range'is siis näitab pre-built image't roheliselt või väiksema transparenciga.
         # Sinna kuhu ei saa ehitada ei tehi seda pre-buildt imaget või on punane
 

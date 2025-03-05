@@ -189,24 +189,19 @@ class Building:
         mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
         x, y = self.player.rect.center
-        wx, wy = mouse_pos
+        world_grid_x, world_grid_y = self.camera.click_to_world_grid(self.player.rect.center, mouse_pos, self.map.tile_size)  # Click coords to world grid
 
-        world_x = x + (wx - self.game.screen_x // 2)  # Player_x + (mouse_x - window_width // 2)
-        world_y = y + (wy - self.game.screen_y // 2)  # Player_y + (mouse_y - window_height // 2)
+        self.selected_item_pos = world_grid_x, world_grid_y
 
-        grid_x, grid_y = world_x // self.map.tile_size, world_y // self.map.tile_size
-        self.selected_item_pos = grid_x, grid_y
+        world_x, world_y = world_grid_x * self.map.tile_size - self.camera.offset.x, world_grid_y * self.map.tile_size - self.camera.offset.y
 
-        world_x, world_y = grid_x * self.map.tile_size - self.camera.offset.x, grid_y * self.map.tile_size - self.camera.offset.y
-
-        can = False
-
-        if self.map.data[grid_x][grid_y] in [1, 100]:
+        if self.map.data[world_grid_x][world_grid_y] in [1, 100]:
             image = self.buildings_dict[self.selected_item]['can_place']
             self.can_place_selected_item = True
         else:
             image = self.buildings_dict[self.selected_item]['can_not_place']
             self.can_place_selected_item = False
+
         self.game.screen.blit(image, (world_x, world_y))
 
     def build_item(self):

@@ -66,7 +66,6 @@ class HeatZone:
             'Blast Furnace': 480
         }
 
-        self.allow_new_heat_source_list = 'Blast Furnace', 'Furnace', 'Bonfire', 'Campfire', 'Firepit', 'Torch'
         self.radius = 0
         self.new_heat_source = "Torch"
         self.new_heat_source = "Torch"
@@ -303,34 +302,19 @@ class HeatZone:
         if pos in self.position_upgradable: 
             self.position_upgradable.remove(pos)
 
-    def create_new_heat_source(self, mouse_pos, tree_rect_dict):
-        # Check if all fire sources are fully upgraded
-        for pos in self.fire_source_dict:
-            stage = self.fire_source_dict[pos]['stage']
-            if stage not in self.allow_new_heat_source_list:
-                return  # Exit if any source is not fully upgraded
+    def create_new_heat_source(self, pos):
+        self.new_heat_source_cost = self.new_heat_source_cost + len(self.all_fire_source_list)
+        # Add a new fire source at the tree's position
+        new_fire_source = {
+            'stage': 'Torch',
+            'count': 0,
+            'position': pos,
+            'fuel count': 0,
+            'fuel counter': 0,
+            'heat range': 'Torch'
+        }
 
-        # Check for interaction with a tree to create a new fire source
-        for tree_pos, tree_rect in tree_rect_dict.items():
-            if tree_rect.collidepoint(mouse_pos):  # Check if mouse is over a tree
-
-                # Add a new fire source at the tree's position
-                new_fire_source = {
-                    'stage': 'Torch',
-                    'count': 0,
-                    'position': tree_pos,
-                    'rect': pygame.Rect(tree_rect.x, tree_rect.y, self.map.tile_size, self.map.tile_size),
-                    'fuel count': 0,
-                    'fuel counter': 0,
-                    'heat range': 'Torch'
-
-                }
-                self.fire_source_dict[tree_pos] = new_fire_source
-
-                # Remove the tree from the tree rect dictionary
-                del tree_rect_dict[tree_pos]
-                return tree_pos
-        return None
+        self.fire_source_dict[pos] = new_fire_source
 
     def create_heat_zone_rect_list(self):
         self.fire_source_rect_list.clear()  # Reset

@@ -33,9 +33,8 @@ class Camera:
         Returns world_x, world_y -> Coordinate position
         """
 
-        world_x = player_rect_center[0] + (mouse_pos[0] - self.game.screen_x // 2)
-        world_y = player_rect_center[1] + (mouse_pos[1] - self.game.screen_y // 2)
-        return world_x, world_y
+        return player_rect_center[0] + (mouse_pos[0] - self.game.screen_x // 2) - self.offset.x,\
+            player_rect_center[1] + (mouse_pos[1] - self.game.screen_y // 2) - self.offset.y
 
     def click_to_world_grid(self, player_rect_center, mouse_pos, tile_size):
         """

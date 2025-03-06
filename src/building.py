@@ -2,7 +2,7 @@ import pygame
 
 
 class Building:
-    def __init__(self, game_instance, images_instance, map_instance, player_instance, render_instance, camera_instance):
+    def __init__(self, game_instance, images_instance, map_instance, player_instance, render_instance, camera_instance, heat_zone_instance):
         # ------- # Load Instances # ------- #
         self.map = map_instance
         self.game = game_instance
@@ -10,6 +10,7 @@ class Building:
         self.player = player_instance
         self.render = render_instance
         self.camera = camera_instance
+        self.heat_zone = heat_zone_instance
 
         # ------- # Do other stuff xD LOL *_* # ------- #
         self.buildings_dict = {
@@ -112,15 +113,12 @@ class Building:
         for y in range(image_copy.get_height()):
             for x in range(image_copy.get_width()):
                 if alpha[x, y] > 0:  # If the pixel is not transparent
-                    # Get the current color of the pixel
-                    r, g, b = pixels[x, y]
 
-                    # Apply the red filter (we'll make the red channel more intense)
-                    r = min(r + 150, 255)  # Make sure the red component doesn't exceed 255
-
-                    # Reassign the modified color back to the pixel
                     # FIXME: muuda mind tagasi vb?
+                    # r, g, b = pixels[x, y]
+                    # r = min(r + 150, 255)  # Make sure the red component doesn't exceed 255
                     # pixels[x, y] = (r, g, b)
+
                     pixels[x, y] = (255, 0, 0)
 
         return image_copy
@@ -171,7 +169,13 @@ class Building:
         # Nende juures on ka kirjas mida vaja, et neid ehitada.
 
     def allow_building(self):
-        ...
+        if 'Wood' not in self.player.inv:
+            return False
+
+        if self.player.inv['Wood'] < self.heat_zone.new_heat_source_cost:
+            return False
+
+        return True
         # Et ehitada peab olema heat-zone'is. vb? ainult mingfi autofeeder ja def wallide jaoks vms
         # Kui menu lahti siis saab ainult ehitada ja liikuda.
 
@@ -181,34 +185,35 @@ class Building:
                 self.selected_item = building_name
                 return True
 
-
         return False
-
 
     def hover_effect(self):
         mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
-        x, y = self.player.rect.center
         world_grid_x, world_grid_y = self.camera.click_to_world_grid(self.player.rect.center, mouse_pos, self.map.tile_size)  # Click coords to world grid
+        world_x, world_y = world_grid_x * self.map.tile_size - self.camera.offset.x, world_grid_y * self.map.tile_size - self.camera.offset.y
 
         self.selected_item_pos = world_grid_x, world_grid_y
 
-        world_x, world_y = world_grid_x * self.map.tile_size - self.camera.offset.x, world_grid_y * self.map.tile_size - self.camera.offset.y
+        terrain_value = self.map.get_terrain_value_at(world_grid_y, world_grid_x)
 
-        if self.map.data[world_grid_x][world_grid_y] in [1, 100]:
+        if terrain_value in [1, 100] and self.allow_building():
             image = self.buildings_dict[self.selected_item]['can_place']
             self.can_place_selected_item = True
+
         else:
             image = self.buildings_dict[self.selected_item]['can_not_place']
             self.can_place_selected_item = False
 
         self.game.screen.blit(image, (world_x, world_y))
 
+        # Kui saab ehitada siis image on half trasnparent
+        # Kui ei saa ehitada siis image on half transparent ja punane
+
     def build_item(self):
         grid_x, grid_y = self.selected_item_pos
         self.map.data[grid_x][grid_y] = self.buildings_dict[self.selected_item]['id']
-
-        # TODO: Heat-Zone asi ka juurde lisada... dicti jne
+        self.heat_zone.create_new_heat_source((grid_x, grid_y))
 
         # Kui valitud item + sobiv koht + piisavalt looti playeril -> vasaku clickiga placeib itemi
 

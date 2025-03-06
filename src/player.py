@@ -163,8 +163,7 @@ class Player:
     def cold_regulator(self):
         """ In cold player is slower """
         """ Player cold damage -> if 0, movement speed slow, health damage until death. """
-
-        terrain_value = self.map.data[self.rect.x // self.map.tile_size][self.rect.y // self.map.tile_size]
+        terrain_value = self.map.get_terrain_value_at(self.rect.x // self.map.tile_size, self.rect.y // self.map.tile_size)
         current_time = pygame.time.get_ticks()  # time for tracking the last damage,heal
         
         self.player_is_cold = False

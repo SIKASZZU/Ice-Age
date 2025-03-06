@@ -16,51 +16,40 @@ class Building:
         self.buildings_dict = {
             'Torch': {
                 'image': self.render.torch_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 20
             },
 
             'Firepit': {
                 'image': self.render.firepit_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 25
             },
 
             'Campfire': {
                 'image': self.render.campfire_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 30
             },
 
             'Bonfire': {
                 'image': self.render.bonfire_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 35
             },
 
             'Furnace': {
                 'image': self.render.furnace_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 40
             },
 
             'Blast Furnace': {
                 'image': self.render.blast_furnace_image,
-                'can_place': None,
-                'can_not_place': None,
-                'rect': None,
                 'id': 45
             },
+
+            'Defencive Wooden Wall': {  # 75x113
+                'image': self.render.defencive_wooden_wall_image,
+                'id': 9,
+                'offset': (0, -self.map.tile_size // 1.5)  # x, y
+            },
+
         }
 
         self.items_to_display = []
@@ -205,7 +194,13 @@ class Building:
             image = self.buildings_dict[self.selected_item]['can_not_place']
             self.can_place_selected_item = False
 
+        if 'offset' in self.buildings_dict[self.selected_item]:
+            offset_x, offset_y = self.buildings_dict[self.selected_item]['offset']
+            self.game.screen.blit(image, (world_x + offset_x, world_y + offset_y))
+            return
+
         self.game.screen.blit(image, (world_x, world_y))
+        return
 
         # Kui saab ehitada siis image on half trasnparent
         # Kui ei saa ehitada siis image on half transparent ja punane
@@ -213,7 +208,9 @@ class Building:
     def build_item(self):
         grid_x, grid_y = self.selected_item_pos
         self.map.data[grid_x][grid_y] = self.buildings_dict[self.selected_item]['id']
-        self.heat_zone.create_new_heat_source((grid_x, grid_y))
+
+        if self.selected_item is self.heat_zone.new_heat_source:
+            self.heat_zone.create_new_heat_source((grid_x, grid_y))
 
         # Kui valitud item + sobiv koht + piisavalt looti playeril -> vasaku clickiga placeib itemi
 

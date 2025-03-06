@@ -41,7 +41,7 @@ class Map:
                 )
 
                 if noise_value > 0.07:
-                    if 4 > random.randint(0, 10):
+                    if 9 > random.randint(0, 10):
                         data[y, x] = 1  # Ground
                         continue
 

@@ -54,12 +54,17 @@ class Render:
         self.blast_furnace_image = self.images.preloading('blast_furnace', blast_furnace_path)
         self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
+        defencive_wooden_wall = 'res/images/defencive_wooden_wall.png'
+        self.defencive_wooden_wall_image = self.images.preloading('defencive_wooden_wall', defencive_wooden_wall)
+        self.defencive_wooden_wall_image = pygame.transform.scale(self.defencive_wooden_wall_image, (self.map.tile_size, self.map.tile_size * 1.5))
+
         # listid
         self.water_images = []
         self.ground_images = []
         self.tree_images = []
         self.tree_images_before = []  # before on aeg, ehk before playerit tuleb need pildid renderida
         self.tree_images_after = []
+        self.defencive_images = []
 
         self.combined_images = []  # koik pildid koos, mis peavad renderitud olema
         self.images_witho_afters = []  # siin listis ei ole tree'sid, mis peavad after player renderitud olema.
@@ -71,6 +76,8 @@ class Render:
         self.ground_surrounding_values = [0, ]
         self.snowy_heated_ground_surrounding_values = [1, 10]
         self.melted_water_values = [0, ]
+
+        self.defencive_wooden_wall_values = [9, ]
 
         self.static_map_surface = None  # Will hold the entire static map surface
 
@@ -91,8 +98,7 @@ class Render:
                     ground_image = None
 
                     if terrain_value in [1, 10]:
-                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx,
-                                                                        self.ground_surrounding_values)
+                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
                         ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
                         if not ground_image:
                             ground_image = self.ground_image
@@ -137,17 +143,16 @@ class Render:
         for position_by_grid in terrain_in_view:
             row_idx, col_idx = position_by_grid
             terrain_value = self.map.data[row_idx][col_idx]
+            position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
             # water
             if terrain_value in [0]:
-                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
                 self.water_images.append((self.water_image, position))
                 continue
 
             # terrain
             elif terrain_value in self.items.areas_combined:
                 ground_image = None
-                position = (row_idx * self.map.tile_size - self.camera.offset.x, col_idx * self.map.tile_size - self.camera.offset.y)
 
                 if terrain_value in self.items.cold_area:
                     surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
@@ -170,6 +175,17 @@ class Render:
 
                 if ground_image:
                     self.ground_images.append((ground_image, position))
+
+                # def wall
+                if terrain_value == 9:
+                    position = (row_idx * self.map.tile_size - self.camera.offset.x,
+                                col_idx * self.map.tile_size - self.camera.offset.y - self.map.tile_size * 1.5)
+
+                    surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.defencive_wooden_wall_values)
+                    defencive_wooden_wall_image = self.tile_set.determine_defencive_wooden_wall_image(surroundings)
+
+                    self.defencive_images.append((defencive_wooden_wall_image, position))
+
 
         images = (self.water_images, self.ground_images, self.heat_source_images, self.tree_images)
         return images
@@ -221,8 +237,8 @@ class Render:
             # self.tree.width, self.tree.height
 
             # Append tree image and position
-            tree_position = (
-            position[0] - self.camera.offset.x - (self.tree.width // 4), position[1] - self.camera.offset.y - (self.tree.height // 2))
+            tree_position = (position[0] - self.camera.offset.x - (self.tree.width // 4),
+                             position[1] - self.camera.offset.y - (self.tree.height // 2))
 
             self.tree_images.append((tree_image, tree_position))
 
@@ -266,6 +282,7 @@ class Render:
         self.heat_source_images = []
         self.snowy_heated_ground_image = []
 
+        self.defencive_images = []
 
     def render_player(self):
         # Adjust player position relative to the camera's offset
@@ -279,16 +296,18 @@ class Render:
         
         self.combined_images = self.render_terrain_in_view(terrain_in_view)
         self.images_witho_afters = self.combined_images[:3]
-        self.tree_images = self.combined_images[3] # render after if render_after == True
+        self.tree_images = self.combined_images[3]  # render after if render_after == True
 
         self.combined_images = self.combined_images[0] + self.combined_images[1] + self.combined_images[2] + self.combined_images[3]
         self.images_witho_afters = self.images_witho_afters[0] + self.images_witho_afters[1] + self.images_witho_afters[2] + self.tree_images_before
+        self.game.screen.blits(self.defencive_images)
 
-        if render_after == True:
+        if render_after:
             self.game.screen.blits(self.images_witho_afters, doreturn=False)
             self.render_player()
             self.player.animations[self.player.current_animation].draw(self.game.screen, animation_x, animation_y)
             self.game.screen.blits(self.tree_images_after, doreturn=False)
+            self.game.screen.blits(self.defencive_images)
             return
 
         self.game.screen.blits(self.combined_images, doreturn=False)

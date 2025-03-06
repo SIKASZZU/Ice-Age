@@ -68,7 +68,6 @@ class HeatZone:
 
         self.radius = 0
         self.new_heat_source = "Torch"
-        self.new_heat_source = "Torch"
         self.new_heat_source_cost = 8  # Wood
 
         self.all_fire_source_list = self.map.get_terrain_value_positions(20)

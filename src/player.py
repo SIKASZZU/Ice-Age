@@ -20,7 +20,7 @@ class Player:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.movement_speed = 5
         
-        self.inv = {}
+        self.inv = {'Wood': 5000}
         tree_logs_path = 'res/images/wood_icon.png'
         tree_log_img = self.images.preloading('log', tree_logs_path)
         self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))

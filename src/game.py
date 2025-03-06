@@ -41,7 +41,7 @@ class Game:
         self.tile_set = TileSet(self.images, self.map)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
-        self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera)
+        self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera, self.heat_zone)
         self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
@@ -100,6 +100,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:  # Tab key
+                    self.building.toggle_menu()
+
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                     mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
@@ -117,20 +121,11 @@ class Game:
 
                         # Ehitab
                         if self.building.selected_item and self.building.selected_item_pos and self.building.can_place_selected_item:
-                            if self.building.allow_building:
-                                self.building.build_item()
-                                break
+                            self.building.build_item()
+                            break
 
                     # Feedi heat_zonei
                     self.heat_zone.feed_heat_source(mouse_pos)
-                    self.required_wood = self.heat_zone.new_heat_source_cost + len(self.heat_zone.all_fire_source_list) * 2  # mdv xD
-
-                    # Asenda puu heat_zoneiga
-                    if self.player.inv.get('Wood', 0) >= self.required_wood:
-                        tree_pos = self.heat_zone.create_new_heat_source(mouse_pos, self.rects_window_coord)
-
-                        if hasattr(self, 'tree'):  # Ensure self.tree exists before calling gather
-                            self.tree.gather(tree_pos, self.required_wood)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:  # Right mouse button
                     mouse_pos = pygame.mouse.get_pos()  # Get the mouse position

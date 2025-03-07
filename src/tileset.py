@@ -17,9 +17,13 @@ class TileSet:
         self.melted_water_image = self.get_tileset_image('Melted_Water_Tileset', melted_water_path)
         self.melted_water_image = pygame.transform.scale(self.melted_water_image, (6 * self.map.tile_size, 3 * self.map.tile_size))
 
-        defencive_wooden_wall_path = 'res/images/defencive_wooden_wall_sprite.png'
-        self.defencive_wooden_wall_image = self.get_tileset_image('Defencive_Wooden_Wall_Tileset', defencive_wooden_wall_path)
-        self.defencive_wooden_wall_image = pygame.transform.scale(self.defencive_wooden_wall_image, (4 * self.map.tile_size, 4 * self.map.tile_size * 1.5))
+        self.load_def_wall_images()
+
+    def load_def_wall_images(self):
+        for i in range(16):
+            setattr(self, f"def_wall_{i}", pygame.transform.scale(
+                self.get_tileset_image(f"def_wall_{i}", f"res/images/def_walls/def_wall_{i}.png"),
+                (self.map.tile_size, self.map.tile_size * 2)))
 
     def get_tileset_image(self, image_name, image_path):
         return self.images.preloading(image_name, image_path=image_path)
@@ -195,46 +199,45 @@ class TileSet:
 
     def determine_defencive_wooden_wall_image(self, surroundings):
         top_empty, bottom_empty, left_empty, right_empty = surroundings
-        tileset_image = self.defencive_wooden_wall_image  # Preloaded tileset image
 
         # All full
         if not top_empty and not bottom_empty and not left_empty and not right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 0, 0, width=75, height=113)  # Center tile full
+            return self.def_wall_0
 
         # All empty
         if top_empty and bottom_empty and left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 3, 1, width=75, height=113)  # Center tile alone
+            return self.def_wall_7
 
         # Three sides empty
         if top_empty and bottom_empty and left_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 2, width=75, height=113)  # Top-edge tile
+            return self.def_wall_9
         if top_empty and bottom_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 0, 2, width=75, height=113)  # Bottom-edge tile
+            return self.def_wall_8
         if top_empty and left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 2, 1, width=75, height=113)  # Left-edge tile
+            return self.def_wall_6
         if bottom_empty and left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 1, width=75, height=113)  # Right-edge tile
+            return self.def_wall_5
 
         # Two sides empty
         if top_empty and left_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 3, 3, width=75, height=113)  # Top-left corner
+            return self.def_wall_15
         if top_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 0, 3, width=75, height=113)  # Top-right corner
+            return self.def_wall_12
         if bottom_empty and left_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 2, 3, width=75, height=113)  # Bottom-left corner
+            return self.def_wall_14
         if bottom_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 3, width=75, height=113)  # Bottom-right corner
+            return self.def_wall_13
         if left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 0, 1, width=75, height=113)  # Bottom-right corner
+            return self.def_wall_4
         if bottom_empty and top_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 3, 0, width=75, height=113)  # Bottom-right corner
+            return self.def_wall_3
 
         # Single side empty
         if top_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 2, 0, width=75, height=113)  # Top edge
+            return self.def_wall_2
         if bottom_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 0, width=75, height=113)  # Bottom edge
+            return self.def_wall_1
         if left_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 3, 2, width=75, height=113)  # Left edge
+            return self.def_wall_11
         if right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 2, 2, width=75, height=113)  # Right edge
+            return self.def_wall_10

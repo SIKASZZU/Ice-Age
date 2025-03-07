@@ -179,7 +179,7 @@ class Render:
                 # def wall
                 if terrain_value == 9:
                     position = (row_idx * self.map.tile_size - self.camera.offset.x,
-                                col_idx * self.map.tile_size - self.camera.offset.y - self.map.tile_size * 1.5)
+                                col_idx * self.map.tile_size - self.camera.offset.y - self.map.tile_size // 1.1)
 
                     surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.defencive_wooden_wall_values)
                     defencive_wooden_wall_image = self.tile_set.determine_defencive_wooden_wall_image(surroundings)

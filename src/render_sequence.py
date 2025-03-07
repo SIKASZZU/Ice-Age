@@ -39,7 +39,7 @@ class RenderSequence:
                     
                 self.render_after = True
                 self.render_after_player.append(tree_grid)
-    
+        
 
 
     def update(self):

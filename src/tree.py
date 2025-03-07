@@ -111,25 +111,11 @@ class Tree:
         if self.harvest_times:
             positions_to_pop = []
             for pos, timings in self.harvest_times.items():
-                change_interval = random.randint(self.anim_change_timings[0], self.anim_change_timings[1])
-                x_grid, y_grid = pos
-                time_of_harvest, last_anim_update, cut_anim_index = timings
-
-                if current_time - time_of_harvest < self.pick_up_time and current_time - last_anim_update > change_interval:
-                    cut_anim_index +=1  # select next animation in cut animation
-                    cut_anim_index %=3  # arvuta ymber et index pysis range 0-2 ehk reminder of max list value
-                    self.harvest_times[pos] = (time_of_harvest, current_time, cut_anim_index)
-                    terrain_value = self.map.data[x_grid, y_grid]
-                    
-                    if terrain_value in self.items.cold_area:
-                        self.map.data[x_grid, y_grid] = self.cut_anim_sorted_snowy[cut_anim_index]
-
-                    elif terrain_value in self.items.heated_area:
-                        self.map.data[x_grid, y_grid] = self.cut_anim_sorted[cut_anim_index]
-
-                if current_time - time_of_harvest > self.pick_up_time:
-                    positions_to_pop.append(pos)
-
+                # if puu muutus fire sourciks randomly => ei anna playerile harvest woodi ning ei updatei tree animationi.
+                if pos in self.heat_zone.fire_source_dict:
+                    continue
+                positions_to_pop = self.change_animation_stage(current_time, timings, pos, positions_to_pop)
+                
             for pos_to_pop in positions_to_pop:
                 self.gather_tree_at_pos(pos_to_pop)
                 self.harvest_times.pop(pos_to_pop)
@@ -145,6 +131,30 @@ class Tree:
 
             if position not in self.harvest_times:
                 self.harvest_times[position] = (current_time, current_time, 0)
+
+
+    def change_animation_stage(self, current_time, timings, pos, positions_to_pop):
+        change_interval = random.randint(self.anim_change_timings[0], self.anim_change_timings[1])
+        x_grid, y_grid = pos
+        time_of_harvest, last_anim_update, cut_anim_index = timings
+
+        if current_time - time_of_harvest < self.pick_up_time and current_time - last_anim_update > change_interval:
+            cut_anim_index +=1  # select next animation in cut animation
+            cut_anim_index %=3  # arvuta ymber et index pysis range 0-2 ehk reminder of max list value
+            self.harvest_times[pos] = (time_of_harvest, current_time, cut_anim_index)
+            terrain_value = self.map.data[x_grid, y_grid]
+            
+            if terrain_value in self.items.cold_area:
+                self.map.data[x_grid, y_grid] = self.cut_anim_sorted_snowy[cut_anim_index]
+
+            elif terrain_value in self.items.heated_area:
+                self.map.data[x_grid, y_grid] = self.cut_anim_sorted[cut_anim_index]
+
+        # add to list if harvest animation cooldown is reached. Time to remove the tree
+        if current_time - time_of_harvest > self.pick_up_time:
+            positions_to_pop.append(pos)
+
+        return positions_to_pop
 
 
     def gather_tree_at_pos(self, position):

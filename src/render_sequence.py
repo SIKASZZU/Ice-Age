@@ -6,11 +6,11 @@ class RenderSequence:
 
         self.render_after = False
 
-        self.render_after_player = []
+        self.render_after_player = set()
 
     def player_collided_with(self):
         """ Find collided obj that player collides with and return pygame.Rect """
-        self.render_after_player = []
+        self.render_after_player = set()
 
         # check only grids around player
         x = self.player.rect[0] // self.map.tile_size
@@ -27,7 +27,7 @@ class RenderSequence:
 
             if self.player.rect.colliderect(tree_rect):
                 self.render_after = True
-                self.render_after_player.append(tree_grid)
+                self.render_after_player.add(tree_grid)
                 break
 
     def add_to_render_sequence(self):
@@ -35,11 +35,10 @@ class RenderSequence:
             the list items can be rendered after the player """
         for tree_grid, tree_rect in self.tree.rects_map_coord.items():
             tree_rect = (tree_rect[0], tree_rect[1], tree_rect[2], tree_rect[3] - tree_rect[3] // 2)
-            if (tree_rect[1] + (tree_rect[3] - tree_rect[3] // 2)) > self.player.rect.y:
+            if (tree_rect[1] + tree_rect[3]) > self.player.rect.y:
                     
+                self.render_after_player.add(tree_grid)
                 self.render_after = True
-                self.render_after_player.append(tree_grid)
-        
 
 
     def update(self):

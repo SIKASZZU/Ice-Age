@@ -241,12 +241,13 @@ class Render:
                              position[1] - self.camera.offset.y - (self.tree.height // 2))
 
             self.tree_images.append((tree_image, tree_position))
-
             if position_by_grid in self.r_sequence.render_after_player:
-                self.tree_images_after.append((tree_image, tree_position))                
-
+                self.tree_images_after.append((tree_image, tree_position))
+                self.tree_images_after.sort(key=lambda item: item[1][1])  # sort by Y
+            
             else:
                 self.tree_images_before.append((tree_image, tree_position))
+                self.tree_images_before.sort(key=lambda item: item[1][1])  # sort by Y
 
         # heat source
         if terrain_value in [20, 25, 30, 35, 40, 45, 120, 125, 130, 135, 140, 145]:

@@ -235,6 +235,6 @@ class TileSet:
         if bottom_empty:
             return self.get_tile(tileset_image, self.map.tile_size, 1, 0, width=75, height=113)  # Bottom edge
         if left_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 2, 2, width=75, height=113)  # Left edge
+            return self.get_tile(tileset_image, self.map.tile_size, 3, 2, width=75, height=113)  # Left edge
         if right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 3, 2, width=75, height=113)  # Right edge
+            return self.get_tile(tileset_image, self.map.tile_size, 2, 2, width=75, height=113)  # Right edge

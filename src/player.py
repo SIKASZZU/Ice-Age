@@ -154,9 +154,8 @@ class Player:
 
 
     def save_travelling_path(self, current_time):
-        player_grid = (self.x // self.map.tile_size, self.y // self.map.tile_size)
+        player_grid = (int(self.x // self.map.tile_size), int(self.y // self.map.tile_size))
         pos_to_pop = set()
-        print(len(self.travelled_path))
 
         if player_grid in self.travelled_path.keys():
             self.travelled_path[player_grid] = current_time  # update grid's last time visited
@@ -170,7 +169,6 @@ class Player:
 
         for grid_info in self.travelled_path.items():
             pos, visited_time = grid_info
-            print(visited_time, current_time)
             if current_time - visited_time > 6000:
                 pos_to_pop.add(pos)
 

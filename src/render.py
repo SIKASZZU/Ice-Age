@@ -18,6 +18,10 @@ class Render:
         self.tiles_x = self.game.screen_x // self.map.tile_size + 1
         self.tiles_y = self.game.screen_y // self.map.tile_size + 2
 
+        trodden_ground_path = 'res/images/snowy_ground_trodden.png'
+        self.trodden_ground_image = self.images.preloading('ground_trodden', trodden_ground_path)
+        self.trodden_ground_image = pygame.transform.scale(self.trodden_ground_image, (self.map.tile_size, self.map.tile_size))
+
         ground_path = 'res/images/snowy_ground.png'
         self.ground_image = self.images.preloading('ground', ground_path)
         self.ground_image = pygame.transform.scale(self.ground_image, (self.map.tile_size, self.map.tile_size))
@@ -159,6 +163,10 @@ class Render:
                     ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
                     if not ground_image:
                         ground_image = self.ground_image
+
+                    # if position_by_grid in self.player.travelled_path.keys():
+                    #     ground_image = self.trodden_ground_image
+
 
                 # TODO: Ground + Melted + Water -> Tilesetti vaja
                 if terrain_value in self.items.heated_area:

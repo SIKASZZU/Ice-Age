@@ -2,7 +2,7 @@ import pygame
 
 
 class Building:
-    def __init__(self, game_instance, images_instance, map_instance, player_instance, render_instance, camera_instance, heat_zone_instance):
+    def __init__(self, game_instance, images_instance, map_instance, player_instance, render_instance, camera_instance, heat_zone_instance, inv):
         # ------- # Load Instances # ------- #
         self.map = map_instance
         self.game = game_instance
@@ -11,6 +11,7 @@ class Building:
         self.render = render_instance
         self.camera = camera_instance
         self.heat_zone = heat_zone_instance
+        self.inventory = inv
 
         # ------- # Do other stuff xD LOL *_* # ------- #
         self.buildings_dict = {
@@ -158,10 +159,10 @@ class Building:
         # Nende juures on ka kirjas mida vaja, et neid ehitada.
 
     def allow_building(self):
-        if 'Wood' not in self.player.inv:
+        if 'Wood' not in self.inventory.inv_items:
             return False
 
-        if self.player.inv['Wood'] < self.heat_zone.new_heat_source_cost:
+        if self.inventory.inv_items['Wood'] < self.heat_zone.new_heat_source_cost:
             return False
 
         return True

@@ -2,7 +2,7 @@ import pygame
 
 
 class HeatZone:
-    def __init__(self, screen, map, camera, player, images):
+    def __init__(self, screen, map, camera, player, images, inv):
         self.snow = None
         self.heat = None
 
@@ -11,6 +11,7 @@ class HeatZone:
         self.screen = screen
         self.player = player
         self.images = images
+        self.inventory = inv
 
         self.fire_source_dict = {}
         self.position_upgradable = []
@@ -169,7 +170,7 @@ class HeatZone:
                 break
 
     def fuel_heat_source(self, mouse_pos):
-        if 'Wood' not in self.player.inv or self.player.inv['Wood'] <= 0:
+        if 'Wood' not in self.inventory.inv_items or self.inventory.inv_items['Wood'] <= 0:
             return
 
         for pos, rect in self.fire_source_rect_list:
@@ -181,9 +182,9 @@ class HeatZone:
             stage = self.fire_source_dict[pos]['stage']
 
             available_space = max_fuel - current_fuel
-            amount = min(self.player.inv['Wood'], available_space)
+            amount = min(self.inventory.inv_items['Wood'], available_space)
 
-            self.player.inv['Wood'] -= amount
+            self.inventory.inv_items['Wood'] -= amount
             self.fire_source_dict[pos]['fuel count'] += amount
             self.fire_source_dict[pos]['heat range'] = stage
             return
@@ -222,7 +223,7 @@ class HeatZone:
         font = pygame.font.Font(None, 45)  # Font and size
         text = f"{required_wood}"  # Cost as string
 
-        if 'Wood' in self.player.inv and self.player.inv['Wood'] >= required_wood:
+        if 'Wood' in self.inventory.inv and self.inventory.inv_items['Wood'] >= required_wood:
             text_color = (0, 255, 0)  # Green text
         else:
             text_color = (255, 0, 0)  # Red text
@@ -262,18 +263,18 @@ class HeatZone:
 
         item = 'Wood'
 
-        if item not in self.player.inv or self.player.inv[item] <= 0:
+        if item not in self.inventory.inv_items or self.inventory.inv_items[item] <= 0:
             return  # No wood in inventory to feed
 
         # Get the required amount to upgrade
         required_to_upgrade = self.heat_zone_stages[current_stage] - current_count
 
         # Determine how much wood to use
-        wood_to_use = min(self.player.inv[item], required_to_upgrade)
+        wood_to_use = min(self.inventory.inv_items[item], required_to_upgrade)
 
-        # Update the fire source count and reduce player inventory
+        # Update the fire source count and reduce inventory inventory
         self.fire_source_dict[pos]['count'] += wood_to_use
-        self.player.inv[item] -= wood_to_use
+        self.inventory.inv_items[item] -= wood_to_use
         # Check if the fire source is ready to upgrade
         if self.fire_source_dict[pos]['count'] >= self.heat_zone_stages[current_stage]:
             # Get all the stages in order
@@ -388,7 +389,7 @@ class HeatZone:
                     count = fire_source['count']
                 
                 try: # try error catch sest 'Wood' ei pruugi inventoris olemas olla
-                    count += self.player.inv['Wood']  # player count, liidab countile, mis positionil on
+                    count += self.inventory.inv_items['Wood']  # player count, liidab countile, mis positionil on
                     if count == 0: count = fire_source['count']
                 except Exception: pass
 

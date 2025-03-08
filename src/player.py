@@ -3,13 +3,14 @@ from sprite import Sprite
 
 
 class Player:
-    def __init__(self, screen, camera, map, font, images, items):
+    def __init__(self, screen, camera, map, font, images, items, inv):
         self.screen = screen
         self.camera = camera
         self.map = map
         self.font = font
         self.images = images
         self.items = items
+        self.inventory = inv
 
         player_pos_grid = self.map.get_terrain_value_positions(20)  # 20 -> Torch ID
 
@@ -19,11 +20,7 @@ class Player:
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.movement_speed = 5
-        
-        self.inv = {'Wood': 5000}
-        tree_logs_path = 'res/images/wood_icon.png'
-        tree_log_img = self.images.preloading('log', tree_logs_path)
-        self.tree_log_image = pygame.transform.scale(tree_log_img, (self.width, self.height))
+        self.travelled_path = {}
 
         # Animation
         self.last_input = "s"
@@ -55,7 +52,10 @@ class Player:
         self.last_time_damaged = None
         self.last_time_healed  = None
 
+
     def movement(self):
+        """ Move player x,y, current_animation, last_input and update self.x,y + rect.x,y values. """
+        
         # FIXME: Kui pelama hakkab ss muuta õigeks
         if self.cold_status == 'MILD':
             self.movement_speed = 10
@@ -115,56 +115,10 @@ class Player:
         self.rect.y = self.y
 
 
-    def add_items(self, item_name, amount=1):
-        """ Add items by name to player's inventory """
-        if item_name in self.inv:
-            self.inv[item_name] += amount    
-        else: 
-            self.inv[item_name] = amount
-
-        # print(f'Collected {amount, item_name}. INV:{self.inv}')
-
-
-    def remove_items(self, item_name, amount=-1):
-        """ Remove items by name to player's inventory """
-        if item_name in self.inv:
-            self.inv[item_name] -= amount
-            print(f'Removed {amount, item_name}. INV:{self.inv}')
-            return True
-        else:
-            print(f'{item_name} not in INV:{self.inv}')
-            return False
-
-
-    def inventory_display(self):
-        """ Above player """
-            
-        # FIXME: autistic
-        item = 'Wood'
-
-        # for item in self.inv:
-        #     print(item)
-        if item not in self.inv:
-            text_amount = '0'
-
-        else:
-            text_amount = str(self.inv[item])
-
-        text_surface = self.font.render(text_amount, True, 'gray')
-        screen_center_pos = self.screen.get_width() // 2 + 35, self.screen.get_height() // 2 - 70
-        text_rect = text_surface.get_rect(center=screen_center_pos)
-
-
-        # log_rect  = text_surface.get_rect(center=(self.screen.get_width() // 2 - 35, self.screen.get_height() // 2 - 65))
-        self.screen.blit(self.tree_log_image, (self.screen.get_width() // 2 - 70, self.screen.get_height() // 2 - 100))
-        self.screen.blit(text_surface, text_rect)
-
-
-    def cold_regulator(self):
+    def cold_regulator(self, current_time):
         """ In cold player is slower """
         """ Player cold damage -> if 0, movement speed slow, health damage until death. """
         terrain_value = self.map.get_terrain_value_at(self.rect.x // self.map.tile_size, self.rect.y // self.map.tile_size)
-        current_time = pygame.time.get_ticks()  # time for tracking the last damage,heal
         
         self.player_is_cold = False
         self.player_is_warm = False
@@ -198,23 +152,47 @@ class Player:
         # print('self.cold_status   ', self.cold_status)
         # print('cold', self.player_is_cold, 'warm', self.player_is_warm)
 
-    def update(self, render_inv):
-        animation_x = animation_y = None
-        if not render_inv:
-            self.cold_regulator()
-            self.movement()
-            self.animations[self.current_animation].update()
 
-            ### Animatsion, player Spritei keskele viimine ###
-            sprite_size = self.frame_size * self.scale_factor
+    def save_travelling_path(self, current_time):
+        player_grid = (self.x // self.map.tile_size, self.y // self.map.tile_size)
+        pos_to_pop = set()
+        print(len(self.travelled_path))
 
-            # sprite_size on sprite keskkoha viimine ruudu vasakusse nurka. 
-            # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
-            animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
-            animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
+        if player_grid in self.travelled_path.keys():
+            self.travelled_path[player_grid] = current_time  # update grid's last time visited
             
-        if render_inv:
-            self.inventory_display()
-            return
-        
+        else:
+            
+            # update travlled path dict with new value
+            self.travelled_path[player_grid] = current_time
+
+        # after some time remove the player_grid from self.travelled_path
+
+        for grid_info in self.travelled_path.items():
+            pos, visited_time = grid_info
+            print(visited_time, current_time)
+            if current_time - visited_time > 6000:
+                pos_to_pop.add(pos)
+
+        for pos in pos_to_pop:
+            self.travelled_path.pop(pos)
+
+
+    def update(self):
+        current_time = pygame.time.get_ticks()  # time for tracking the last damage,heal
+
+        animation_x = animation_y = None
+        self.cold_regulator(current_time)
+        self.movement()
+        self.save_travelling_path(current_time)
+        self.animations[self.current_animation].update()
+
+        ### Animatsion, player Spritei keskele viimine ###
+        sprite_size = self.frame_size * self.scale_factor
+
+        # sprite_size on sprite keskkoha viimine ruudu vasakusse nurka. 
+        # (self.rect[2 ja 3] // 2) on spritei viimine ruudu keskkohta.
+        animation_x = self.x - self.camera.offset.x - sprite_size // 2 + self.rect[2] // 2
+        animation_y = self.y - self.camera.offset.y - sprite_size // 2 + self.rect[3] // 2
+
         return animation_x, animation_y

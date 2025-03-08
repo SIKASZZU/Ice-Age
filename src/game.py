@@ -15,6 +15,7 @@ from framerate import Framerate
 from collision import Collision
 from render_sequence import RenderSequence
 from building import Building
+from inventory import Inventory
 
 jurigged.watch()
 
@@ -33,15 +34,16 @@ class Game:
         self.items = Items()
         self.map = Map(self.screen, self.camera)
         self.images = Images()
-        self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items)
-        self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images)
-        self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone, self.items)
+        self.inventory = Inventory(self.screen, self.images, self.font)
+        self.player = Player(self.screen, self.camera, self.map, self.font, self.images, self.items, self.inventory)
+        self.heat_zone = HeatZone(self.screen, self.map, self.camera, self.player, self.images, self.inventory)
+        self.tree = Tree(self.screen, self.images, self.map, self.camera, self.player, self.heat_zone, self.items, self.inventory)
         self.collision = Collision(self.player, self.tree, self.map, self.screen, self.camera)
         self.r_sequence = RenderSequence(self.tree, self.player, self.map)
         self.tile_set = TileSet(self.images, self.map)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
-        self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera, self.heat_zone)
+        self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera, self.heat_zone, self.inventory)
         self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
@@ -67,9 +69,9 @@ class Game:
         terrain_in_view = self.renderer.get_terrain_in_view()
 
         self.screen.fill((0, 0, 255))  # FIRST // Clear the screen with a black color
-        animations = self.player.update(False)  # Alati enne renderer'i
+        animations = self.player.update()  # Alati enne renderer'i
         self.renderer.update(self.r_sequence.render_after, animations)
-        self.player.update(render_inv=True)
+        self.inventory.update()
 
         self.rects_window_coord, self.tree_position_coord = self.tree.update()
         # self.collision.draw_rects()

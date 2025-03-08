@@ -2,7 +2,7 @@ import pygame
 import random
 
 class Tree:
-    def __init__(self, screen, images, map, camera, player, heat_zone, items):
+    def __init__(self, screen, images, map, camera, player, heat_zone, items, inv):
         self.images = images
         self.map = map
         self.screen = screen
@@ -10,6 +10,7 @@ class Tree:
         self.player = player
         self.heat_zone = heat_zone
         self.items = items
+        self.inventory = inv
 
         self.width = self.map.tile_size * 1.75
         self.height = self.map.tile_size * 2.5
@@ -50,7 +51,7 @@ class Tree:
         self.rects_map_coord = {}  # grid: rect // map koordinaatide jargi rectid
 
         # snowy tree image
-        path_snowy = 'res/images/snowy_tree.png'
+        path_snowy = 'res/images/snowy_tree_thick_snow.png'
         self.img_snowy = self.images.preloading('tree_snowy', path_snowy)
         self.image_snowy = pygame.transform.scale(self.img_snowy, (self.width, self.height))
 
@@ -168,7 +169,7 @@ class Tree:
 
             # Add each resource to the player's inventory
             for resource, amount in resources_collected.items():
-                self.player.add_items(item_name=resource, amount=amount+100)
+                self.inventory.add_items(item_name=resource, amount=amount+100)
 
             self.total_trees_harvested += 1
 

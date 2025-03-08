@@ -22,6 +22,34 @@
 
 > kui puud on heat zoneis ss ajaga muutuvad rohelisemaks. Erinevad staadiumid..
 
+ Puidu amount on nagu skill > alguses saab vahem, siis hiljem hakkab saama rohkem.
+
+> majade ehitiste loomine
+	> neid saab ainult heat areatele lisada
+	> sealt seest tuleb rand arv inimesi v'lja kes aitavad seda heati yleval pidada
+	> nad ei saa puid lohkuda? aga nad saavad hoiustatud puid kasutada kyla ylalpidamiseks
+	
+> lume paksuse kontrollimine
+    # Ok seda saab teha nii
+        # snowy puud saab teha selliseks, et juure juurest on snowy tree pildil lumine ja shadow on korgemal.
+        # Kui player on kusagil kainud juba, siis on lumi maha tallatud
+        # Teha teine snow pilt, kus on 
+    # kui player kaib kusagil, ss jaab trail maha.
+        # trail saab taituda yle aja kui player pole seal kaua kainud
+
+> Player peab millegi parast avastamas kaima???
+> Player ei tohi votta puid millegi p2rast?
+    > Puude kandmine aeglustab teda?
+
+# Story?
+> Inimene, kes okupeeriti ufode poolt. 
+    Inimene, kes okupeeriti ufode poolt. Ufod andsid talle sooja pideva riietuse 
+    ning erilised võimed nimelt puude korjamise oma  paljaste kätega ning nende hoiustamine 
+    mikroskoopilisel tasandil. Nüüd suudab see inimene luua terve tsivilisatsiooni ainult metsast. 
+    Ufode eesmärk on jälgida tema tegevusi, et aretada  välja iseseisvad Maailmaloojad. 
+    Überinimesed, kelle ainus eesmärk on luua tsivilisatsioon elututel planeetidel. 
+    Ehitada maju, kus antakse elu inimestele, kes on maapinna alla jäätunud.
+
 
 Golem
 def init>

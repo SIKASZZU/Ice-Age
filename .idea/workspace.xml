@@ -6,6 +6,31 @@
   <component name="ChangeListManager">
     <list default="true" id="8aa242fa-1708-4ea0-8f5e-379ea536d400" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Down.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Idle_Down.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Idle_Left.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Idle_Right.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Idle_Up.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Left.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Pick_Up.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Right.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/Up.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/blast_furnace.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/bonfire.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/campfire.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/campfire_sprite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/defencive_wooden_wall.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/defencive_wooden_wall_sprite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/firepit.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/firepit_sprite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/furnace.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/melted_water.png" beforeDir="false" afterPath="$PROJECT_DIR$/res/images/melted_water.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/snowy_ground_snowy_heated_ground.png" beforeDir="false" afterPath="$PROJECT_DIR$/res/images/snowy_ground_snowy_heated_ground.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/res/images/torch.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/game.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/heat_zone.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/heat_zone.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/render.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/render.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tileset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tileset.py" afterDir="false" />
     </list>

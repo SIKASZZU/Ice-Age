@@ -109,6 +109,11 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                     mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
+                    # - # - # Prints terrain value based on the click.  # - # - #
+                    x, y = self.camera.click_to_world_grid(self.player.rect.center, mouse_pos, self.map.tile_size)
+                    print(f"{self.map.data[x][y]}")
+                    # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
+
                     # Building ICON
                     if self.building.building_icon_rect.collidepoint(mouse_pos):
                         self.building.toggle_menu()

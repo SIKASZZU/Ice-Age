@@ -34,31 +34,31 @@ class Render:
         self.snowy_heated_image = self.images.preloading('snowy_heated_ground', snowy_heated_path)
         self.snowy_heated_image = pygame.transform.scale(self.snowy_heated_image, (self.map.tile_size, self.map.tile_size))
 
-        torch_path = 'res/images/torch.png'
+        torch_path = 'res/images/heat_source/torch.png'
         self.torch_image = self.images.preloading('torch', torch_path)
         self.torch_image = pygame.transform.scale(self.torch_image, (self.map.tile_size, self.map.tile_size))
 
-        firepit_path = 'res/images/firepit.png'
+        firepit_path = 'res/images/heat_source/firepit.png'
         self.firepit_image = self.images.preloading('firepit', firepit_path)
         self.firepit_image = pygame.transform.scale(self.firepit_image, (self.map.tile_size, self.map.tile_size))
 
-        campfire_path = 'res/images/campfire.png'
+        campfire_path = 'res/images/heat_source/campfire.png'
         self.campfire_image = self.images.preloading('campfire', campfire_path)
         self.campfire_image = pygame.transform.scale(self.campfire_image, (self.map.tile_size, self.map.tile_size))
 
-        bonfire_path = 'res/images/bonfire.png'
+        bonfire_path = 'res/images/heat_source/bonfire.png'
         self.bonfire_image = self.images.preloading('bonfire', bonfire_path)
         self.bonfire_image = pygame.transform.scale(self.bonfire_image, (self.map.tile_size, self.map.tile_size))
 
-        furnace_path = 'res/images/furnace.png'
+        furnace_path = 'res/images/heat_source/furnace.png'
         self.furnace_image = self.images.preloading('furnace', furnace_path)
         self.furnace_image = pygame.transform.scale(self.furnace_image, (self.map.tile_size, self.map.tile_size))
 
-        blast_furnace_path = 'res/images/blast_furnace.png'
+        blast_furnace_path = 'res/images/heat_source/blast_furnace.png'
         self.blast_furnace_image = self.images.preloading('blast_furnace', blast_furnace_path)
         self.blast_furnace_image = pygame.transform.scale(self.blast_furnace_image, (self.map.tile_size, self.map.tile_size))
 
-        defencive_wooden_wall = 'res/images/defencive_wooden_wall.png'
+        defencive_wooden_wall = 'res/images/def_walls/defencive_wooden_wall.png'
         self.defencive_wooden_wall_image = self.images.preloading('defencive_wooden_wall', defencive_wooden_wall)
         self.defencive_wooden_wall_image = pygame.transform.scale(self.defencive_wooden_wall_image, (self.map.tile_size, self.map.tile_size * 1.5))
 
@@ -84,42 +84,6 @@ class Render:
         self.defencive_wooden_wall_values = [9, ]
 
         self.static_map_surface = None  # Will hold the entire static map surface
-
-
-    def create_static_map_surface(self):
-        # Create a new surface to hold the entire map's static tiles
-        width, height = self.map.width * self.map.tile_size, self.map.height * self.map.tile_size
-        self.static_map_surface = pygame.Surface((width, height))
-
-        for row_idx, row in enumerate(self.map.data):
-            for col_idx, terrain_value in enumerate(row):
-                position = (col_idx * self.map.tile_size, row_idx * self.map.tile_size)
-
-                if terrain_value in [0]:
-                    self.static_map_surface.blit(self.water_image, position)
-
-                elif terrain_value in [1, 10, 100, 110, 20]:
-                    ground_image = None
-
-                    if terrain_value in [1, 10]:
-                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.ground_surrounding_values)
-                        ground_image = self.tile_set.determine_snowy_ground_image(surroundings)
-                        if not ground_image:
-                            ground_image = self.ground_image
-
-                    if terrain_value in [100, 110, 20]:
-                        surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.snowy_heated_ground_surrounding_values)
-                        ground_image = self.tile_set.determine_snowy_heated_ground_image(surroundings)
-
-                        if not ground_image:
-                            surroundings = self.tile_set.check_surroundings(row_idx, col_idx, self.melted_water_values)
-                            ground_image = self.tile_set.determine_melted_water_image(surroundings)
-
-                        if not ground_image:
-                            ground_image = self.snowy_heated_image
-
-                    if ground_image:
-                        self.static_map_surface.blit(ground_image, position)
 
     def get_terrain_in_view(self):
         terrain_in_view = []

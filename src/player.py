@@ -19,7 +19,7 @@ class Player:
         self.height = 50
         self.width = 50
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.movement_speed = 5
+        self.movement_speed = 20
         self.travelled_path = {}
 
         # Animation
@@ -31,15 +31,15 @@ class Player:
         self.frame_size = 130
 
         self.animations = {
-            "idle_left": Sprite("res/images/Idle_Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "idle_right": Sprite("res/images/Idle_Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "idle_up": Sprite("res/images/Idle_Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "idle_down": Sprite("res/images/Idle_Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_left": Sprite("res/images/player/Idle_Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_right": Sprite("res/images/player/Idle_Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_up": Sprite("res/images/player/Idle_Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "idle_down": Sprite("res/images/player/Idle_Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
 
-            "move_left": Sprite("res/images/Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "move_right": Sprite("res/images/Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "move_up": Sprite("res/images/Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
-            "move_down": Sprite("res/images/Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_left": Sprite("res/images/player/Left.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_right": Sprite("res/images/player/Right.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_up": Sprite("res/images/player/Up.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
+            "move_down": Sprite("res/images/player/Down.png", self.frame_size, self.frame_size, 4, self.animation_speed, self.scale_factor),
         }
 
         # Cold
@@ -47,10 +47,10 @@ class Player:
         self.player_is_warm = False        
         self.cold_tolerance = 10
         self.damage_by_cold = 1
-        self.regen_by_heat  = 1
-        self.cold_status    = 'Ok'  # NEAR_FROZEN, Extreme, Mild, Ok
+        self.regen_by_heat = 1
+        self.cold_status = 'Ok'  # NEAR_FROZEN, Extreme, Mild, Ok
         self.last_time_damaged = None
-        self.last_time_healed  = None
+        self.last_time_healed = None
 
 
     def movement(self):
@@ -58,13 +58,13 @@ class Player:
         
         # FIXME: Kui pelama hakkab ss muuta õigeks
         if self.cold_status == 'MILD':
-            self.movement_speed = 10
+            self.movement_speed = 20
 
         if self.cold_status == 'EXTREME':
-            self.movement_speed = 10
+            self.movement_speed = 20
 
         if self.cold_status == 'NEAR_FROZEN':
-            self.movement_speed = 10
+            self.movement_speed = 20
 
         moving = False
 

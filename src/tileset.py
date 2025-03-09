@@ -60,13 +60,13 @@ class TileSet:
     def determine_snowy_ground_image(self, surroundings):
         top_empty, bottom_empty, left_empty, right_empty = surroundings
 
+        tileset_image = self.snowy_ground_tileset_image  # Preloaded tileset image
+
         if not top_empty and not bottom_empty and not left_empty and not right_empty:
             return None
 
-        tileset_image = self.snowy_ground_tileset_image  # Preloaded tileset image
-
         if top_empty and bottom_empty and left_empty and right_empty:
-            return self.get_tile(tileset_image, self.map.tile_size, 1, 1)  # Center tile
+            return self.get_tile(tileset_image, self.map.tile_size, 5, 1)  # Center tile
 
         # Three sides empty
         if top_empty and bottom_empty and left_empty:
@@ -102,8 +102,6 @@ class TileSet:
         if right_empty:
             return self.get_tile(tileset_image, self.map.tile_size, 1, 2)  # Right edge
 
-        # Default case: No surrounding match
-        return None
 
     def determine_snowy_heated_ground_image(self, surroundings):
         top_empty, bottom_empty, left_empty, right_empty = surroundings

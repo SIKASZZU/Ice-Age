@@ -52,5 +52,6 @@ class Camera:
 
         return world_grid_x, world_grid_y
 
+
     def update(self, player):
         self.center_target_camera(player)

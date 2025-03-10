@@ -16,14 +16,14 @@ from collision import Collision
 from render_sequence import RenderSequence
 from building import Building
 from inventory import Inventory
-
+from manage_building import ManageBuilding, ManageHeatSources
 jurigged.watch()
 
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen_x, self.screen_y = 1920 // 2, 1080 // 2
+        self.screen_x, self.screen_y = 1920, 1080
         self.screen = pygame.display.set_mode((self.screen_x, self.screen_y))  # Set up the game window
         self.clock = pygame.time.Clock()
         self.running = True 
@@ -43,7 +43,11 @@ class Game:
         self.tile_set = TileSet(self.images, self.map)
 
         self.renderer = Render(self, self.camera, self.map, self.player, self.tree, self.images, self.tile_set, self.heat_zone, self.items, self.r_sequence)
+
         self.building = Building(self, self.images, self.map, self.player, self.renderer, self.camera, self.heat_zone, self.inventory)
+        self.manage_heat_source = ManageHeatSources(self, self.heat_zone, self.map, self.renderer)
+        self.manage_buildings = ManageBuilding(self, self.map, self.player, self.manage_heat_source)
+
         self.weather = Weather(self, self.screen, self.player)
         self.framerate = Framerate()
 
@@ -89,7 +93,7 @@ class Game:
 
         self.weather.update()
         self.building.update()
-
+        self.manage_buildings.update()
         pygame.display.flip()  # LAST // Update display
 
     def run(self):
@@ -109,15 +113,26 @@ class Game:
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
                     mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
 
+
                     # - # - # Prints terrain value based on the click.  # - # - #
                     x, y = self.camera.click_to_world_grid(self.player.rect.center, mouse_pos, self.map.tile_size)
                     print(f"{self.map.data[x][y]}")
+                    pos = (x, y)
+
                     # - # - # - # - # - # - # - # - # - # - # - # - # - # - # - #
 
                     # Building ICON
                     if self.building.building_icon_rect.collidepoint(mouse_pos):
                         self.building.toggle_menu()
                         break
+
+                    if self.map.data[x][y] in self.manage_buildings.buildings_list:
+                        self.manage_buildings.toggle_menu(pos)
+
+                    state = self.manage_heat_source.handle_event(event, self.manage_buildings.building_pos)
+
+                    if state:
+                        self.manage_buildings.toggle_menu(pos)
 
                     # Valib itemi ja ehitab
                     if self.building.menu_state:
